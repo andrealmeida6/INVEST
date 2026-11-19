@@ -1,0 +1,284 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Investment Hub</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="1%20-%20C%C3%B3digo%20VSC/web-files/global.css?v=3b6a292b">
+<meta name="theme-color" content="#00338D">
+<link rel="icon" type="image/png" sizes="192x192" href="1%20-%20C%C3%B3digo%20VSC/web-files/icone-192.png?v=95c2b26f">
+<link rel="apple-touch-icon" href="1%20-%20C%C3%B3digo%20VSC/web-files/apple-touch-icon.png?v=cc224d76">
+</head>
+<body>
+<a class="ps-skip" href="#conteudo">Skip to content</a>
+<header class="ps-h" data-cabecalho>
+  <div class="ps-h-row">
+    <a class="ps-marca" href="/inicio/" aria-label="Home"><span class="ps-marca-mono">IH</span><span class="ps-marca-txt">Investment Hub<small>Seguradora A</small></span></a>
+    <nav class="ps-h-nav" aria-label="Main navigation">
+      <a class="ps-h-link" href="/inicio/" data-nav="Inicio">Home</a>
+      <div class="ps-h-grp" data-nav-grp>
+        <button type="button" class="ps-h-mbtn" aria-haspopup="true">Portfolio<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>
+        <div class="ps-h-drop">
+          <a class="ps-h-link" href="/instrumentos/" data-nav="Instrumentos">Instruments</a>
+          <a class="ps-h-link" href="/carteiras/" data-nav="Carteiras">Portfolios</a>
+          <a class="ps-h-link" href="/posicoes/" data-nav="Posicoes">Positions &amp; lots</a>
+          <a class="ps-h-link" href="/afetacoes/" data-nav="Afetacoes">Asset allocation</a>
+        </div>
+      </div>
+      <div class="ps-h-grp" data-nav-grp>
+        <button type="button" class="ps-h-mbtn" aria-haspopup="true">Operations<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>
+        <div class="ps-h-drop">
+          <a class="ps-h-link" href="/operacoes/" data-nav="Operacoes">Transactions</a>
+          <a class="ps-h-link" href="/valorizacoes/" data-nav="Valorizacoes">Valuations</a>
+          <a class="ps-h-link" href="/imparidade/" data-nav="Imparidade">Impairment (ECL)</a>
+        </div>
+      </div>
+      <div class="ps-h-grp" data-nav-grp>
+        <button type="button" class="ps-h-mbtn" aria-haspopup="true">Accounting<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>
+        <div class="ps-h-drop">
+          <a class="ps-h-link" href="/contabilidade/" data-nav="Contabilidade">Period close &amp; entries</a>
+          <a class="ps-h-link" href="/relatorios/" data-nav="Relatorios">Reports</a>
+        </div>
+      </div>
+      <div class="ps-h-grp" data-nav-grp>
+        <button type="button" class="ps-h-mbtn" aria-haspopup="true">Control<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>
+        <div class="ps-h-drop">
+          <a class="ps-h-link" href="/limites/" data-nav="Limites">Investment limits</a>
+          <a class="ps-h-link" href="/aprovacoes/" data-nav="Aprovacoes">Approvals <span class="n" data-campo="nav-aprov"></span></a>
+          <a class="ps-h-link" href="/trilho/" data-nav="Trilho">Audit trail</a>
+        </div>
+      </div>
+      <a class="ps-h-link admin" href="/backoffice/" data-nav="Backoffice">Backoffice</a>
+    </nav>
+    <div class="ps-h-acts">
+      <span class="ps-h-pill">Reference date <b data-campo="data-ref"></b></span>
+      <button type="button" class="ps-av" aria-label="Account">PL</button>
+      <button type="button" class="ps-h-ico ps-h-toggle" data-a="toggleNav" aria-label="Menu">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+      </button>
+    </div>
+  </div>
+</header>
+
+<main id="conteudo">
+<section class="ps-pagina" hidden data-pagina="Inicio">
+  <section class="ps-hero ps-fundo-marca">
+  <svg class="ps-hero-fx" aria-hidden="true"><defs><pattern id="ps-grelha" width="64" height="64" patternUnits="userSpaceOnUse"><rect x="6" y="6" width="52" height="52" rx="8"/></pattern></defs><rect class="ps-hero-g" width="100%" height="100%" fill="url(#ps-grelha)"/></svg>
+  <div class="ps-hero-in">
+    <div>
+      <h1>Investment Hub</h1>
+      <div class="ps-hero-ola"><small>Insurance investment portfolios: administration, control and accounting</small><span data-campo="hero-ola"></span></div>
+    </div>
+    <div class="ps-glass ps-est-h">
+      <div data-bloco="inicio-estado"></div>
+
+    </div>
+  </div>
+</section>
+
+  <div class="ps-wrap">
+    <div class="ps-ini">
+      <div class="ps-ini-esq">
+        <div data-bloco="inicio-fecho"></div>
+
+        <div data-bloco="inicio-alertas"></div>
+
+      </div>
+      <div data-bloco="inicio-fluxos"></div>
+
+    </div>
+  </div>
+</section>
+
+<section class="ps-pagina" hidden data-pagina="Instrumentos">
+  <div class="ps-pag">
+    <header class="ps-pag-head">
+  <h1>Instruments</h1>
+  <p>The single register of financial instruments, shared by every portfolio and legal entity. Positions, book value and fair value are calculated from the lots, never typed in.</p>
+</header>
+
+    <div data-bloco="instrumentos"></div>
+
+  </div>
+</section>
+
+<section class="ps-pagina" hidden data-pagina="Instrumento">
+  <div class="ps-pag">
+    <header class="ps-pag-head">
+  <h1>Instrument</h1>
+  <p>Static data, cash-flow schedule, positions by portfolio and lot, prices and history of one instrument. Every figure opens its calculation.</p>
+</header>
+
+    <div data-bloco="instrumento"></div>
+
+  </div>
+</section>
+
+<section class="ps-pagina" hidden data-pagina="Carteiras">
+  <div class="ps-pag">
+    <header class="ps-pag-head">
+  <h1>Portfolios</h1>
+  <p>Portfolios and sub-portfolios of the legal entity by allocation type, with the coverage of technical provisions by the allocated assets.</p>
+</header>
+
+    <div data-bloco="carteiras"></div>
+
+  </div>
+</section>
+
+<section class="ps-pagina" hidden data-pagina="Posicoes">
+  <div class="ps-pag">
+    <header class="ps-pag-head">
+  <h1>Positions &amp; lots</h1>
+  <p>Positions by portfolio and instrument at the reference date. Expand a position to see its lots, each with its own cost, effective interest rate and IFRS 9 classification.</p>
+</header>
+
+    <div data-bloco="posicoes"></div>
+
+  </div>
+</section>
+
+<section class="ps-pagina" hidden data-pagina="Afetacoes">
+  <div class="ps-pag">
+    <header class="ps-pag-head">
+  <h1>Asset allocation</h1>
+  <p>Allocate, reallocate and release assets between portfolios. Nothing is overwritten: every movement keeps origin, destination, who recorded and who approved.</p>
+</header>
+
+    <div data-bloco="afetacoes"></div>
+
+  </div>
+</section>
+
+<section class="ps-pagina" hidden data-pagina="Operacoes">
+  <div class="ps-pag">
+    <header class="ps-pag-head">
+  <h1>Transactions</h1>
+  <p>Purchases, sales, coupons, redemptions and other movements. Coupons and redemptions are proposed from the cash-flow schedule and confirmed against the custodian.</p>
+</header>
+
+    <div data-bloco="operacoes"></div>
+
+  </div>
+</section>
+
+<section class="ps-pagina" hidden data-pagina="Valorizacoes">
+  <div class="ps-pag">
+    <header class="ps-pag-head">
+  <h1>Valuations</h1>
+  <p>Prices by date and source with the IFRS 13 level. Missing, stale or unusual prices are held as exceptions, and manual prices need approval.</p>
+</header>
+
+    <div data-bloco="valorizacoes"></div>
+
+  </div>
+</section>
+
+<section class="ps-pagina" hidden data-pagina="Imparidade">
+  <div class="ps-pag">
+    <header class="ps-pag-head">
+  <h1>Impairment (ECL)</h1>
+  <p>Expected credit losses by lot under IFRS 9: stage, probability of default, loss given default and exposure, with the movement of the period.</p>
+</header>
+
+    <div data-bloco="imparidade"></div>
+
+  </div>
+</section>
+
+<section class="ps-pagina" hidden data-pagina="Limites">
+  <div class="ps-pag">
+    <header class="ps-pag-head">
+  <h1>Investment limits</h1>
+  <p>Use of internal and regulatory limits by issuer, group, country, rating and asset class. Breaches need a justification and an owner.</p>
+</header>
+
+    <div data-bloco="limites"></div>
+
+  </div>
+</section>
+
+<section class="ps-pagina" hidden data-pagina="Contabilidade">
+  <div class="ps-pag">
+    <header class="ps-pag-head">
+  <h1>Period close &amp; entries</h1>
+  <p>Guided monthly close and the journal entries generated by the accounting rules, ready to export to the ERP.</p>
+</header>
+
+    <div data-bloco="contabilidade"></div>
+
+  </div>
+</section>
+
+<section class="ps-pagina" hidden data-pagina="Relatorios">
+  <div class="ps-pag">
+    <header class="ps-pag-head">
+  <h1>Reports</h1>
+  <p>Inventory, allocation and coverage map, Solvency II list of assets (S.06.02), income and gains (S.09.01) and movement schedules. Every report can be reproduced at a past closing date.</p>
+</header>
+
+    <div data-bloco="relatorios"></div>
+
+  </div>
+</section>
+
+<section class="ps-pagina" hidden data-pagina="Aprovacoes">
+  <div class="ps-pag">
+    <header class="ps-pag-head">
+  <h1>Approvals</h1>
+  <p>Everything that needs a second pair of eyes: transactions, reallocations, manual prices, impairment overrides and parameter changes. Whoever recorded cannot approve.</p>
+</header>
+
+    <div data-bloco="aprovacoes"></div>
+
+  </div>
+</section>
+
+<section class="ps-pagina" hidden data-pagina="Trilho">
+  <div class="ps-pag">
+    <header class="ps-pag-head">
+  <h1>Audit trail</h1>
+  <p>Every change to every record: previous value, new value, who, when, why and from where.</p>
+</header>
+
+    <div data-bloco="trilho"></div>
+
+  </div>
+</section>
+
+<section class="ps-pagina" hidden data-pagina="Backoffice">
+  <div class="ps-pag">
+    <header class="ps-pag-head">
+  <h1>Backoffice</h1>
+  <p>Parameters that change the behaviour of the platform without code: accounting rules, chart of accounts, portfolio types and dimensions, PD and LGD tables, price tolerances and limits.</p>
+</header>
+
+    <div data-bloco="backoffice"></div>
+
+  </div>
+</section>
+
+</main>
+<nav class="ps-bnav" data-bnav aria-label="Mobile navigation">
+  <a href="/inicio/" data-nav="Inicio"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 11l9-8 9 8"/><path d="M5 10v10h14V10"/></svg>Home</a>
+  <a href="/posicoes/" data-nav="Posicoes"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 20V10M12 20V4M18 20v-7"/></svg>Positions</a>
+  <a href="/operacoes/" data-nav="Operacoes"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h10"/></svg>Transactions</a>
+  <a href="/aprovacoes/" data-nav="Aprovacoes"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>Approvals</a>
+  <a href="/contabilidade/" data-nav="Contabilidade"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 8h8M8 12h8M8 16h5"/></svg>Closing</a>
+</nav>
+
+<div class="ps-pan-f" data-pan-fundo hidden></div>
+<aside class="ps-pan largo" data-pan hidden>
+  <div class="ps-pan-h"><h2 data-pan-t></h2><button type="button" class="ps-btn peq" data-a="fecharPan">Close</button></div>
+  <div class="ps-pan-b" data-pan-b></div>
+</aside>
+<div class="ps-toast" data-toast role="status" aria-live="polite" hidden></div>
+
+<script src="1%20-%20C%C3%B3digo%20VSC/web-files/inv-dados.js?v=e9a4af8a"></script>
+<script src="1%20-%20C%C3%B3digo%20VSC/web-files/inv-motor.js?v=9c1c9063"></script>
+<script src="1%20-%20C%C3%B3digo%20VSC/web-files/inv-app.js?v=2df610cc"></script>
+<script src="1%20-%20C%C3%B3digo%20VSC/web-files/inv-paginas.js?v=0971da74"></script>
+</body>
+</html>
