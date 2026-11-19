@@ -88,10 +88,39 @@
     toggleNav: function () { document.querySelector('.ps-h').classList.toggle('open'); }
   };
 
-  window.addEventListener('hashchange', rota);
-  document.addEventListener('DOMContentLoaded', function () {
+  window.addEventListener('hashchange', function () { if (window.INV) rota(); });
+
+  /* Chamadas ao Supabase: so funcoes (RPC). As tabelas nao se leem com a chave publica (001_inv_esquema.sql) */
+  APP.rpc = function (fn, corpo) {
+    var C = window.INV_BACKEND;
+    corpo = Object.assign({ p_utilizador: APP.utilizador ? APP.utilizador.login : '' }, corpo || {});
+    return fetch(C.url + '/rest/v1/rpc/' + fn, { method: 'POST', headers: { apikey: C.chave, Authorization: 'Bearer ' + C.chave, 'Content-Type': 'application/json' }, body: JSON.stringify(corpo) })
+      .then(function (r) {
+        return r.text().then(function (t) {
+          var v = t ? JSON.parse(t) : null;
+          if (!r.ok) throw new Error(v && v.message ? v.message : 'Supabase ' + r.status);
+          return v;
+        });
+      });
+  };
+  APP.recarregar = function () { return APP.rpc('inv_dados').then(function (d) { window.INV = d; APP.iniciar(); }); };
+
+  /* Arranque, depois de inv-acesso.js confirmar o utilizador e trazer os dados */
+  APP.iniciar = function () {
+    var u = APP.utilizador || { nome: '' };
     document.querySelector('[data-campo="data-ref"]').textContent = APP.dt(INV.dataRef);
-    var n = document.querySelector('[data-campo="nav-aprov"]'); if (n) n.textContent = INV.aprovacoes.length;
+    var av = document.querySelector('[data-campo="avatar"]');
+    if (av) av.textContent = u.nome.split(/\s+/).filter(Boolean).map(function (p) { return p[0]; }).slice(0, 2).join('');
+    var pend = INV.aprovacoes.filter(function (a) { return a.por !== u.nome; }).length;
+    var n = document.querySelector('[data-campo="nav-aprov"]'); if (n) { n.textContent = pend; n.hidden = !pend; }
+    APP.preparar();
     rota();
-  });
+  };
+  APP.acoes.menuConta = function () {
+    var m = document.querySelector('[data-menu]'), u = APP.utilizador || {};
+    if (!m.hidden) { m.hidden = true; return; }
+    m.innerHTML = '<div class="ps-menu-head"><b>' + APP.e(u.nome) + '</b>' + APP.e(u.login) + ' · ' + APP.e(u.perfil) + '</div><div class="ps-menu-sec"><button type="button" class="ps-menu-it" data-a="sair">Sign out<small>Forget this user on this browser</small></button></div>';
+    m.hidden = false;
+  };
+  document.addEventListener('click', function (ev) { var m = document.querySelector('[data-menu]'); if (m && !m.hidden && !ev.target.closest('[data-menu],[data-a="menuConta"]')) m.hidden = true; });
 })();

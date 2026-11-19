@@ -1,6 +1,6 @@
-/* inv-dados.js - dados de demonstracao do mockup (Anexo B da especificacao).
+/* dados-demonstracao.js - dados de demonstracao (Anexo B da especificacao). Fonte do 002_inv_dados_demonstracao.sql (node gerar-dados.js).
    Entidade ficticia "Seguradora A". Emitentes de divida publica identificados pelo Estado; empresas ficticias.
-   Na plataforma real estes dados vem do Dataverse. Os valores sao calculados pelo inv-motor.js. */
+   O ecra le-os do Supabase (inv_dados); na plataforma real vem do Dataverse. Os valores sao calculados pelo inv-motor.js. */
 window.INV = {
   dataRef: '2026-10-31',
   periodo: 'Outubro 2026',
@@ -92,6 +92,7 @@ window.INV = {
   ],
 
   operacoes: [
+    { id: 'OP-1189', tipo: 'Purchase', i: 'I05', c: 'LIVRES', neg: '2026-11-04', liq: '2026-11-06', q: 1000000, preco: 98.74, jc: 18082.19, valor: 1005482.19, estado: 'Pending approval', por: 'André Borges' },
     { id: 'OP-1187', tipo: 'Coupon', i: 'I04', c: 'VIDA', neg: '2026-10-30', liq: '2026-10-30', q: 5000000, valor: 100000, estado: 'Pending approval', por: 'Ana Ramos' },
     { id: 'OP-1188', tipo: 'Coupon', i: 'I04', c: 'PPR', neg: '2026-10-30', liq: '2026-10-30', q: 2500000, valor: 50000, estado: 'Pending approval', por: 'Ana Ramos' },
     { id: 'OP-1185', tipo: 'Purchase', i: 'I13', c: 'NVIDA', neg: '2026-10-20', liq: '2026-10-21', q: 2000, preco: 104.71, valor: 209420, estado: 'Approved', por: 'Ana Ramos', apr: 'Pedro Lima' },
@@ -101,6 +102,7 @@ window.INV = {
   ],
 
   aprovacoes: [
+    { tipo: 'Transaction', ref: 'OP-1189', desc: 'Purchase Bund 2,5% 2035 · Livres · 1 000 000 nominal', por: 'André Borges', em: '2026-11-05 10:20', imp: 'Recorded by you' },
     { tipo: 'Transaction', ref: 'OP-1187', desc: 'Coupon BTP 4% 2031 · Vida · 100 000,00 EUR', por: 'Ana Ramos', em: '2026-11-02 09:10', imp: 'Matches cash-flow schedule and custodian statement' },
     { tipo: 'Transaction', ref: 'OP-1188', desc: 'Coupon BTP 4% 2031 · Fundo autónomo PPR · 50 000,00 EUR', por: 'Ana Ramos', em: '2026-11-02 09:11', imp: 'Matches cash-flow schedule and custodian statement' },
     { tipo: 'Reallocation', ref: 'AF-0032', desc: 'Fundo Monetário I · 15 000 units · Livres → Vida', por: 'Ana Ramos', em: '2026-11-03 09:15', imp: 'Coverage Vida +5,5 p.p. · no limits affected' },

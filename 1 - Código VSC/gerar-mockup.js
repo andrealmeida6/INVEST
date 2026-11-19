@@ -25,7 +25,11 @@ const html = resolver(ler('web-templates', 'layout-portal.html').replace(/\{%\s*
 
 /* Cada ficheiro leva ?v= com a impressao digital do conteudo, para o browser nao usar uma versao antiga em cache */
 const versao = (f) => { try { return '?v=' + crypto.createHash('md5').update(fs.readFileSync(path.join(cod, 'web-files', f))).digest('hex').slice(0, 8); } catch (er) { return ''; } };
-const montar = (web) => html.replace(/(href|src)="\/(global\.css|[\w.-]+\.(?:js|png))"/g, (_, a, f) => a + '="' + web + f + versao(f) + '"');
+/* Supabase (mesmo projeto do ON, tabelas inv_). A chave publicavel foi feita para estar no navegador:
+   quem protege os dados e o RLS e as funcoes de supabase/001_inv_esquema.sql */
+const BACKEND = { url: 'https://yujhfscnnngaivwwunom.supabase.co', chave: 'sb_publishable_wU6S2mgSbmnTzz4hQMKZ6g_jTj6MMgo' };
+const montar = (web) => html.replace(/(href|src)="\/(global\.css|[\w.-]+\.(?:js|png))"/g, (_, a, f) => a + '="' + web + f + versao(f) + '"')
+  .replace('<script src="' + web + 'inv-motor.js', () => '<script>window.INV_BACKEND = ' + JSON.stringify(BACKEND) + ';</script>\n<script src="' + web + 'inv-motor.js');
 
 const mockup = '<!-- Gerado por gerar-mockup.js. Nao editar: alterar as web pages, snippets ou templates. -->\n' + montar(encodeURI('../' + path.basename(cod) + '/web-files/'));
 fs.writeFileSync(path.join(raiz, '3 - Mockups', 'mockup-final.html'), mockup, 'utf8');

@@ -1,11 +1,10 @@
 /* inv-paginas.js - blocos dinamicos de cada pagina (web template 'bloco-dinamico', id = nome do bloco).
-   Usa INV (inv-dados.js), MOTOR (inv-motor.js) e APP (inv-app.js). */
+   Usa INV (carregado do Supabase por inv-acesso.js), MOTOR (inv-motor.js) e APP (inv-app.js).
+   APP.preparar() recalcula tudo sempre que os dados chegam ou mudam. */
 (function () {
   'use strict';
   var e = APP.e, eur = APP.eur, B = APP.blocos, A = APP.acoes;
-  var USER = 'Pedro Lima';
-  var REF = INV.dataRef;
-  var L = MOTOR.lotes(INV, REF);
+  var USER, REF, L, TOT;
   var cart = function (id) { return INV.carteiras.filter(function (c) { return c.id === id; })[0] || { nome: id }; };
   var insP = function (id) { return INV.instrumentos.filter(function (x) { return x.id === id; })[0]; };
   var soma = function (arr, k) { return arr.reduce(function (s, x) { return s + (typeof k === 'function' ? k(x) : x[k]) || 0; }, 0); };
@@ -13,7 +12,6 @@
   var divida = function (i) { return i.tipo === 'obr' || i.tipo === 'dep'; };
   var qtd = function (i, q) { return divida(i) ? eur(q) : APP.int(q) + ' units'; };
   var link = function (i) { return '<a href="/instrumento/?id=' + i.id + '">' + e(i.nome) + '</a><span class="ps-mut ps-small ps-mono" style="display:block">' + e(i.isin || i.codigo) + '</span>'; };
-  var TOT = soma(L, 'sii');
   var porCart = function (id) { return L.filter(function (r) { return r.cart === id; }); };
 
   /* ---------------- Inicio ---------------- */
@@ -241,10 +239,10 @@
       '<label class="ps-campo"><span class="ps-lab">Lot</span><select class="ps-sel" data-on="afLote">' + L.map(function (r) { return '<option value="' + r.lote.id + '"' + (r.lote.id === nf.lote ? ' selected' : '') + '>' + r.lote.id + ' · ' + e(r.ins.nome) + ' · ' + e(cart(r.cart).nome) + '</option>'; }).join('') + '</select></label>' +
       '<label class="ps-campo"><span class="ps-lab">Nominal or quantity to move</span><input class="ps-in" type="number" value="' + nf.q + '" data-on="afQ"></label>' +
       '<label class="ps-campo"><span class="ps-lab">Destination</span><select class="ps-sel" data-on="afPara">' + INV.carteiras.map(function (c) { return '<option value="' + c.id + '"' + (c.id === nf.para ? ' selected' : '') + '>' + e(c.nome) + '</option>'; }).join('') + '</select></label>' +
-      '<label class="ps-campo"><span class="ps-lab">Effective date</span><input class="ps-in" type="date" value="' + REF + '"></label>' +
-      '<label class="ps-campo ps-form-1" style="grid-column:1/-1"><span class="ps-lab">Reason</span><textarea class="ps-ta" rows="2" placeholder="Mandatory"></textarea></label></div>' +
+      '<label class="ps-campo"><span class="ps-lab">Effective date</span><input class="ps-in" type="date" value="' + REF + '" data-af-data></label>' +
+      '<label class="ps-campo ps-form-1" style="grid-column:1/-1"><span class="ps-lab">Reason</span><textarea class="ps-ta" rows="2" placeholder="Mandatory" data-af-motivo></textarea></label></div>' +
       '<h3 class="iv-h3">Impact before approval (R-24)</h3><div data-impacto>' + impacto() + '</div>' +
-      '<div class="ps-sp ps-mt"><button class="ps-btn pri" data-a="ok" data-v="Reallocation submitted for approval">Submit for approval</button><span class="ps-small ps-mut">Recorded by ' + USER + '. Another person approves.</span></div>';
+      '<div class="ps-sp ps-mt"><button class="ps-btn pri" data-a="reafetar">Submit for approval</button><span class="ps-small ps-mut">Recorded by ' + USER + '. Another person approves.</span></div>';
     var hist = APP.tabela([
       { t: 'ID', k: function (a) { return '<span class="ps-mono">' + a.id + '</span>'; } },
       { t: 'Effective', k: function (a) { return APP.dt(a.data); } },
@@ -416,22 +414,32 @@
 
   /* ---------------- Aprovacoes ---------------- */
   B['aprovacoes'] = function () {
-    var lista = INV.aprovacoes.concat([{ tipo: 'Transaction', ref: 'OP-1189', desc: 'Purchase Bund 2,5% 2035 · Livres · 1 000 000 nominal', por: USER, em: '2026-11-05 10:20', imp: 'Recorded by you' }]);
-    return APP.card(INV.aprovacoes.length + ' waiting', APP.tabela([
+    var lista = INV.aprovacoes;
+    return APP.card(INV.aprovacoes.filter(function (a) { return a.por !== USER; }).length + ' waiting for you', APP.tabela([
       { t: 'Type', k: function (a) { return APP.chip(a.tipo, 'rev'); } }, { t: 'Reference', k: function (a) { return '<span class="ps-mono">' + a.ref + '</span>'; } },
       { t: 'What', k: function (a) { return '<b>' + e(a.desc) + '</b><span class="ps-mut ps-small" style="display:block">' + e(a.imp) + '</span>'; } },
       { t: 'Requested', k: function (a) { return e(a.por) + '<span class="ps-mut ps-small" style="display:block">' + APP.dt(a.em) + '</span>'; } },
       { t: '', k: function (a) { return a.por === USER ? '<span class="ps-small ps-mut">You recorded this: another person approves (R-18)</span>' : '<div class="ps-sp"><button class="ps-btn ok peq" data-a="aprovar" data-v="' + a.ref + '">Approve</button><button class="ps-btn err peq" data-a="rejeitar" data-v="' + a.ref + '">Reject</button></div>'; } }
     ], lista));
   };
-  A.aprovar = function (ref) {
-    INV.aprovacoes = INV.aprovacoes.filter(function (a) { return a.ref !== ref; });
-    INV.trilho.unshift({ em: '2026-11-05 12:00', u: USER, t: 'Approval', reg: ref, campo: 'State', ant: 'Pending approval', novo: 'Approved', mot: '', orig: 'Screen' });
-    document.querySelector('[data-campo="nav-aprov"]').textContent = INV.aprovacoes.length;
-    APP.render(); APP.aviso(ref + ' approved', 'ok');
+  /* Decisoes e reafetacoes gravam no Supabase (inv_decidir, inv_reafetar) e recarregam os dados */
+  var gravar = function (fn, corpo, msg) {
+    return APP.rpc(fn, corpo).then(function () { APP.fecharPan(); return APP.recarregar(); }).then(function () { APP.aviso(msg, 'ok'); })
+      .catch(function (er) { APP.aviso(er.message, 'err'); });
   };
+  A.aprovar = function (ref) { gravar('inv_decidir', { p_ref: ref, p_aprovar: true, p_motivo: null }, ref + ' approved'); };
   A.rejeitar = function (ref) {
-    APP.painel('Reject ' + e(ref), '<label class="ps-campo"><span class="ps-lab">Reason (mandatory)</span><textarea class="ps-ta" rows="3"></textarea></label><div class="ps-sp"><button class="ps-btn err cheio" data-a="ok" data-v="' + e(ref) + ' rejected and returned">Reject</button></div>');
+    APP.painel('Reject ' + e(ref), '<label class="ps-campo"><span class="ps-lab">Reason (mandatory)</span><textarea class="ps-ta" rows="3" data-rej-motivo></textarea></label><div class="ps-sp"><button class="ps-btn err cheio" data-a="rejeitarOk" data-v="' + e(ref) + '">Reject</button></div>');
+  };
+  A.rejeitarOk = function (ref) {
+    var m = document.querySelector('[data-rej-motivo]').value.trim();
+    if (!m) { APP.aviso('A reason is mandatory to reject', 'err'); return; }
+    gravar('inv_decidir', { p_ref: ref, p_aprovar: false, p_motivo: m }, ref + ' rejected and returned');
+  };
+  A.reafetar = function () {
+    var m = document.querySelector('[data-af-motivo]').value.trim(), d = document.querySelector('[data-af-data]').value;
+    if (!m) { APP.aviso('The reason is mandatory (R-15)', 'err'); return; }
+    gravar('inv_reafetar', { p_lote: nf.lote, p_quantidade: +nf.q, p_destino: nf.para, p_data: d, p_motivo: m }, 'Reallocation submitted for approval');
   };
 
   /* ---------------- Trilho ---------------- */
@@ -467,4 +475,11 @@
       APP.card(abas.filter(function (a) { return a[0] === abaB; })[0][1], corpo, '<button class="ps-btn peq" data-a="ok" data-v="Change submitted for approval">Edit</button>') + '</div>';
   };
   A.abaB = function (v) { abaB = v; APP.render(); };
+
+  APP.preparar = function () {
+    USER = APP.utilizador ? APP.utilizador.nome : '';
+    REF = INV.dataRef;
+    L = MOTOR.lotes(INV, REF);
+    TOT = soma(L, 'sii');
+  };
 })();

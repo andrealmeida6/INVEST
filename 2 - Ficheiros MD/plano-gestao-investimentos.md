@@ -27,6 +27,9 @@ Estado a 19 de novembro de 2026. A especificação funcional está em `especific
 | Contabilidade | A aplicação é o subrazão de investimentos e exporta lançamentos para o ERP. Plano de contas como dados | O PCES em vigor ainda tem de ser confirmado |
 | Solvência II | Entrega o S.06.02 e o S.09.01 em Excel. Não produz XBRL | As seguradoras já têm ferramenta de reporte |
 | Motor de cálculo | Biblioteca isolada (`inv-motor.js`), testável em Node | Permite levar o mesmo código para o servidor |
+| Entrada e dados | Ecrã de entrada só com nome de utilizador, como no ON. Os dados vêm do Supabase (mesmo projeto do ON, tabelas `inv_`). Para já só `andreborges` tem acesso | Indicação do André, 19 de novembro de 2026 |
+| Segurança no Supabase | Tabelas com RLS e sem permissões. O navegador só chama 4 funções que confirmam o utilizador: entrar, ler os dados, aprovar/rejeitar e reafetar. Quem pediu não aprova, também no servidor (R-18) | As tabelas não ficam expostas com a chave pública |
+| Gravação | Aprovar, rejeitar e submeter reafetações gravam no Supabase e ficam no trilho. Os restantes botões continuam a ser demonstração | Primeiro passo; o resto segue o mesmo padrão |
 
 ## Estado
 
@@ -36,6 +39,7 @@ Estado a 19 de novembro de 2026. A especificação funcional está em `especific
 | Análise de mercado | Feita, com fontes. Evidência de avaliações públicas fraca |
 | Mockup | 15 páginas navegáveis com dados de demonstração e cálculo real (TJE, custo amortizado, juro corrido, reserva, ECL, lançamentos, S.06.02) |
 | Testes do motor | Cenários C-01, C-02, C-05 e estágios a passar |
+| Supabase | Esquema, funções e dados de demonstração aplicados. Testado com o papel `anon`: tabelas sem acesso direto, utilizador sem acesso recusado, aprovação do próprio pedido recusada |
 | Power Pages | Só conteúdo (HTML, CSS, JS). Sem metadados `.yml` até haver um `pac pages download` |
 | Dataverse | Por desenhar a partir da secção 6 |
 
@@ -47,6 +51,7 @@ Estado a 19 de novembro de 2026. A especificação funcional está em `especific
 4. Completar os cenários de teste C-03, C-04, C-06 a C-10 no motor (venda com custo médio, reafetação parcial, preço manual, segregação, período fechado, lançamentos equilibrados, reprodução).
 5. Desenhar as tabelas Dataverse e as permissões (secções 5 e 6).
 6. Decidir onde corre o motor de cálculo no servidor (secção 21).
+7. Levar para o Supabase as restantes ações (nova operação, preço manual, confirmar cupão, parâmetros do backoffice).
 
 ## Questões em aberto
 

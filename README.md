@@ -15,4 +15,4 @@ node gerar-mockup.js
 node testes/motor.test.js
 ```
 
-Os dados de demonstração são fictícios (Seguradora A).
+Ao abrir pede o utilizador (para já só `andreborges`). Os dados vêm do Supabase (`1 - Código VSC/supabase/`) e são fictícios (Seguradora A).

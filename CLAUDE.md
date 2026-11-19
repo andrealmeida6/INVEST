@@ -20,6 +20,7 @@ Plataforma de administração, controlo e contabilização de carteiras de inves
 | `1 - Código VSC/web-templates/` | Layouts e blocos Liquid, incluindo blocos com parâmetros |
 | `1 - Código VSC/web-files/` | CSS global, JavaScript, imagens e outros ficheiros |
 | `1 - Código VSC/testes/` | Testes do motor de cálculo (cenários da secção 24) |
+| `1 - Código VSC/supabase/` | Esquema, funções e dados de demonstração no Supabase (tabelas `inv_`) |
 | `2 - Ficheiros MD/` | Especificação, plano e análise de mercado |
 | `3 - Mockups/` | Mockups HTML que abrem diretamente no browser |
 | `4 - Agentes/` | Definições de agentes |
@@ -28,10 +29,17 @@ Plataforma de administração, controlo e contabilização de carteiras de inves
 
 | Ficheiro | Função |
 | --- | --- |
-| `inv-dados.js` | Dados de demonstração (Anexo B). Na plataforma vêm do Dataverse |
 | `inv-motor.js` | Motor de cálculo: fluxos, juro corrido, TJE, custo amortizado, justo valor, reservas, ECL. Não depende do ecrã, para ser testado e reutilizado no servidor |
 | `inv-app.js` | Núcleo do ecrã: navegação, formatos, tabelas, painel lateral, avisos |
 | `inv-paginas.js` | Blocos dinâmicos de cada página (`bloco-dinamico` com o id do bloco) |
+| `inv-acesso.js` | Ecrã de entrada só com nome de utilizador (como o `portal-acesso.js` do ON) e carregamento dos dados do Supabase |
+
+## Supabase
+
+- Mesmo projeto do ON, tabelas com o prefixo `inv_`. RLS ligado e sem permissões diretas: o navegador só chama as funções `inv_acesso_entrar`, `inv_dados`, `inv_decidir` e `inv_reafetar`, que confirmam o utilizador em `inv_acessos`.
+- `supabase/001_inv_esquema.sql`: tabelas, funções e acessos. `supabase/002_inv_dados_demonstracao.sql`: dados de demonstração, gerado por `node gerar-dados.js` a partir de `supabase/dados-demonstracao.js`. Não se edita à mão.
+- Acessos: só `andreborges` (administrador). Para acrescentar ou retirar pessoas, ver o fim do `001_inv_esquema.sql`.
+- Entrar só com o nome não é segurança forte. Serve para limitar quem abre a demonstração. Não pôr dados reais.
 
 ## Do mockup para o Power Pages
 
