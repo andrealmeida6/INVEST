@@ -7,11 +7,11 @@ insert into public.inv_parametros (chave, valor) values
   ('periodo', '"Outubro 2026"');
 insert into public.inv_entidades (id, nome, moeda, metodo_lotes) values
   ('SA', 'Seguradora A', 'EUR', 'Custo médio ponderado');
-insert into public.inv_carteiras (id, entidade_id, nome, tipo, afeto, ramo, modelo_negocio, carteira_sii, provisoes_tecnicas, fundo_autonomo, ordem) values
-  ('VIDA', 'SA', 'Vida com participação nos resultados', 'Afetos - Vida', true, 'Vida', 'Deter para receber e vender', 'Life', 28600000, null, 0),
-  ('NVIDA', 'SA', 'Não Vida', 'Afetos - Não Vida', true, 'Não Vida', 'Deter para receber', 'Non-life', 10500000, null, 1),
-  ('PPR', 'SA', 'Fundo autónomo PPR', 'Afetos - fundo autónomo', true, 'Vida', 'Deter para receber e vender', 'Ring fenced funds', 9750000, 'RFF-01', 2),
-  ('LIVRES', 'SA', 'Ativos livres', 'Não afetos (livres)', false, '-', 'Deter para receber e vender', 'General', 0, null, 3);
+insert into public.inv_carteiras (id, entidade_id, nome, tipo, afeto, ramo, classe_contas, modelo_negocio, carteira_sii, provisoes_tecnicas, fundo_autonomo, ordem) values
+  ('VIDA', 'SA', 'Vida com participação nos resultados', 'a) Vida com participação nos resultados, sem investimento autónomo', true, 'Vida', '20', 'Deter para recolher e vender (Hold to collect and sell)', 'Life', 28600000, null, 0),
+  ('NVIDA', 'SA', 'Não Vida', 'g) Restantes seguros não vida', true, 'Não Vida', '22', 'Deter para recolher (Hold to collect)', 'Non-life', 10500000, null, 1),
+  ('PPR', 'SA', 'Fundo autónomo PPR', 'b) Vida com participação nos resultados, com investimento autónomo', true, 'Vida', '20', 'Deter para recolher e vender (Hold to collect and sell)', 'Ring fenced funds', 9750000, 'RFF-01', 2),
+  ('LIVRES', 'SA', 'Valores livres', 'h) Valores livres', false, '-', '23', 'Deter para recolher e vender (Hold to collect and sell)', 'General', 0, null, 3);
 insert into public.inv_emitentes (id, nome, tipo, pais, nace, rating, rating_anterior, grupo) values
   ('PT', 'República Portuguesa', 'Soberano', 'PT', 'O84.1.1', 'A', null, null),
   ('ES', 'Reino de Espanha', 'Soberano', 'ES', 'O84.1.1', 'A', null, null),
@@ -41,24 +41,24 @@ insert into public.inv_instrumentos (id, isin, codigo, nome, tipo, emitente_id, 
   ('I13', 'LU00DEMO0013', null, 'Fundo Monetário I (UCITS)', 'fundo', 'GES', 'LU43', null, null, null, null, null, null, 104.886, 1, null, 'NAV do gestor', null, false, null, null, 12),
   ('I14', null, 'DP-BAN-2027', 'Depósito a prazo Banco B 2,6% 2027', 'dep', 'BAN', 'XT74', 0.026, 1, 'ACT/360', '2026-03-01', '2027-03-01', 1, 100, 2, 'Pass', 'Valor nominal + juro', null, false, null, null, 13);
 insert into public.inv_lotes (id, instrumento_id, carteira_id, data_aquisicao, quantidade, quantidade_inicial, preco_aquisicao, classificacao, rating_aquisicao) values
-  ('L001', 'I01', 'VIDA', '2024-09-12', 6000000, null, 99.1, 'JVORI', 'BBB+'),
-  ('L002', 'I01', 'PPR', '2025-03-04', 3000000, null, 98.2, 'JVORI', 'A-'),
+  ('L001', 'I01', 'VIDA', '2024-09-12', 6000000, null, 99.1, 'FVOCI', 'BBB+'),
+  ('L002', 'I01', 'PPR', '2025-03-04', 3000000, null, 98.2, 'FVOCI', 'A-'),
   ('L003', 'I02', 'NVIDA', '2022-02-10', 3000000, 4000000, 103.85, 'CA', 'BBB'),
-  ('L004', 'I03', 'VIDA', '2023-06-20', 5000000, null, 99.4, 'JVORI', 'A'),
-  ('L005', 'I04', 'VIDA', '2024-01-15', 5000000, null, 101.95, 'JVORI', 'BBB'),
-  ('L006', 'I04', 'PPR', '2024-05-08', 2500000, null, 100.6, 'JVORI', 'BBB'),
-  ('L007', 'I05', 'VIDA', '2025-03-20', 7000000, null, 97.35, 'JVORI', 'AAA'),
+  ('L004', 'I03', 'VIDA', '2023-06-20', 5000000, null, 99.4, 'FVOCI', 'A'),
+  ('L005', 'I04', 'VIDA', '2024-01-15', 5000000, null, 101.95, 'FVOCI', 'BBB'),
+  ('L006', 'I04', 'PPR', '2024-05-08', 2500000, null, 100.6, 'FVOCI', 'BBB'),
+  ('L007', 'I05', 'VIDA', '2025-03-20', 7000000, null, 97.35, 'FVOCI', 'AAA'),
   ('L008', 'I06', 'NVIDA', '2023-03-10', 3000000, null, 91.2, 'CA', 'AAA'),
-  ('L009', 'I07', 'VIDA', '2024-02-01', 4000000, null, 100.25, 'JVORI', 'BBB+'),
+  ('L009', 'I07', 'VIDA', '2024-02-01', 4000000, null, 100.25, 'FVOCI', 'BBB+'),
   ('L010', 'I07', 'NVIDA', '2024-02-01', 2000000, null, 100.25, 'CA', 'BBB+'),
-  ('L011', 'I08', 'PPR', '2023-07-12', 4500000, null, 100.8, 'JVORI', 'BBB+'),
-  ('L012', 'I08', 'LIVRES', '2024-10-03', 3000000, null, 103.1, 'JVORI', 'A-'),
-  ('L013', 'I09', 'VIDA', '2022-10-05', 3500000, null, 86.4, 'JVORI', 'BBB'),
-  ('L014', 'I10', 'LIVRES', '2021-05-17', 150000, null, 14.8, 'JVORI-AC', null),
-  ('L015', 'I11', 'LIVRES', '2023-09-28', 400000, null, 5.62, 'JVR', null),
-  ('L016', 'I12', 'LIVRES', '2019-12-30', 350000, null, 5, 'JVORI-AC', null),
-  ('L017', 'I13', 'NVIDA', '2026-01-05', 20000, null, 101.95, 'JVR', null),
-  ('L018', 'I13', 'LIVRES', '2025-06-02', 15000, null, 100.77, 'JVR', null),
+  ('L011', 'I08', 'PPR', '2023-07-12', 4500000, null, 100.8, 'FVOCI', 'BBB+'),
+  ('L012', 'I08', 'LIVRES', '2024-10-03', 3000000, null, 103.1, 'FVOCI', 'A-'),
+  ('L013', 'I09', 'VIDA', '2022-10-05', 3500000, null, 86.4, 'FVOCI', 'BBB'),
+  ('L014', 'I10', 'LIVRES', '2021-05-17', 150000, null, 14.8, 'FVOCI-EQ', null),
+  ('L015', 'I11', 'LIVRES', '2023-09-28', 400000, null, 5.62, 'FVTPL', null),
+  ('L016', 'I12', 'LIVRES', '2019-12-30', 350000, null, 5, 'FVOCI-EQ', null),
+  ('L017', 'I13', 'NVIDA', '2026-01-05', 20000, null, 101.95, 'FVTPL', null),
+  ('L018', 'I13', 'LIVRES', '2025-06-02', 15000, null, 100.77, 'FVTPL', null),
   ('L019', 'I14', 'NVIDA', '2026-03-01', 1500000, null, 100, 'CA', 'A-');
 insert into public.inv_afetacoes (id, data_efetiva, lote_id, quantidade, carteira_origem, carteira_destino, motivo, registado_por, registado_em, aprovado_por, aprovado_em, estado) values
   ('AF-0031', '2026-10-15', 'L012', 3000000, 'PPR', 'LIVRES', 'Excesso de cobertura do fundo autónomo PPR após resgates', 'Ana Ramos', '2026-10-15 10:42:00 Europe/Lisbon', 'Pedro Lima', '2026-10-15 16:03:00 Europe/Lisbon', 'Approved'),
@@ -74,10 +74,10 @@ insert into public.inv_operacoes (id, tipo, instrumento_id, carteira_id, data_ne
   ('OP-1183', 'Dividend', 'I10', 'LIVRES', '2026-10-06', '2026-10-09', 150000, null, null, 52500, 13125, 'Approved', 'Ana Ramos', 'Pedro Lima', null),
   ('OP-1182', 'Impairment', 'I09', 'VIDA', '2026-10-31', '2026-10-31', 3500000, null, null, 0, null, 'Draft', 'Rui Matos', null, 'Passagem a estágio 2 por perda de investment grade');
 insert into public.inv_aprovacoes (ref, tipo, descricao, pedido_por, pedido_em, impacto) values
-  ('OP-1189', 'Transaction', 'Purchase Bund 2,5% 2035 · Livres · 1 000 000 nominal', 'André Borges', '2026-11-05 10:20:00 Europe/Lisbon', 'Recorded by you'),
+  ('OP-1189', 'Transaction', 'Purchase Bund 2,5% 2035 · Valores livres · 1 000 000 nominal', 'André Borges', '2026-11-05 10:20:00 Europe/Lisbon', 'Recorded by you'),
   ('OP-1187', 'Transaction', 'Coupon BTP 4% 2031 · Vida · 100 000,00 EUR', 'Ana Ramos', '2026-11-02 09:10:00 Europe/Lisbon', 'Matches cash-flow schedule and custodian statement'),
   ('OP-1188', 'Transaction', 'Coupon BTP 4% 2031 · Fundo autónomo PPR · 50 000,00 EUR', 'Ana Ramos', '2026-11-02 09:11:00 Europe/Lisbon', 'Matches cash-flow schedule and custodian statement'),
-  ('AF-0032', 'Reallocation', 'Fundo Monetário I · 15 000 units · Livres → Vida', 'Ana Ramos', '2026-11-03 09:15:00 Europe/Lisbon', 'Coverage Vida +5,5 p.p. · no limits affected'),
+  ('AF-0032', 'Reallocation', 'Fundo Monetário I · 15 000 units · Valores livres → Vida', 'Ana Ramos', '2026-11-03 09:15:00 Europe/Lisbon', 'Coverage Vida +5,5 p.p. · no limits affected'),
   ('PR-0412', 'Manual price', 'Imobiliária H, S.A. · 7,10 EUR/share (was 6,80) · Level 3', 'Ana Ramos', '2026-11-04 14:22:00 Europe/Lisbon', 'Fair value +105 000,00 EUR in OCI · valuation report attached'),
   ('ECL-0098', 'Stage change', 'Energia C 2,25% 2032 · stage 1 → 2 (lost investment grade)', 'Rui Matos', '2026-11-04 17:40:00 Europe/Lisbon', 'Lifetime ECL replaces 12-month ECL'),
   ('BO-0021', 'Parameter', 'Price tolerance, corporate bonds: daily change 3% → 4%', 'Rui Matos', '2026-11-05 11:05:00 Europe/Lisbon', 'Would release 1 open price exception');
@@ -86,7 +86,7 @@ insert into public.inv_trilho (em, utilizador, objeto, registo, campo, valor_ant
   ('2026-10-10 12:41:00 Europe/Lisbon', 'Pedro Lima', 'Transaction', 'OP-1184', 'State', 'Pending approval', 'Approved', null, 'Screen'),
   ('2026-10-15 16:03:00 Europe/Lisbon', 'Pedro Lima', 'Allocation', 'AF-0031', 'State', 'Pending approval', 'Approved', null, 'Screen'),
   ('2026-11-02 08:55:00 Europe/Lisbon', 'Sistema', 'Import', 'IMP-0377', 'Prices 2026-10-30', '-', '12 prices, 1 exception', 'Ficheiro do custodiante', 'File import'),
-  ('2026-11-03 09:15:00 Europe/Lisbon', 'Ana Ramos', 'Allocation', 'AF-0032', 'Portfolio', 'Livres', 'Vida (pending)', 'Reforço da cobertura Vida', 'Screen'),
+  ('2026-11-03 09:15:00 Europe/Lisbon', 'Ana Ramos', 'Allocation', 'AF-0032', 'Portfolio', 'Valores livres', 'Vida (pending)', 'Reforço da cobertura Vida', 'Screen'),
   ('2026-11-04 14:22:00 Europe/Lisbon', 'Ana Ramos', 'Price', 'PR-0412', 'Price', '6,80', '7,10 (pending)', 'Relatório de avaliação 30/09/2026', 'Screen'),
   ('2026-11-04 17:40:00 Europe/Lisbon', 'Rui Matos', 'Impairment', 'ECL-0098', 'Stage', '1', '2 (pending)', 'Rating BB+ (perda de investment grade)', 'Calculation'),
   ('2026-11-05 11:05:00 Europe/Lisbon', 'Rui Matos', 'Parameter', 'BO-0021', 'Tolerance (corporate bonds)', '3%', '4% (pending)', 'Volatilidade do mercado de crédito', 'Backoffice');
@@ -109,16 +109,18 @@ insert into public.inv_fecho_passos (ordem, titulo, estado, detalhe) values
   (8, 'Journal entries generated and exported', 'todo', 'Export to ERP'),
   (9, 'Period closed', 'todo', 'Needs approval');
 insert into public.inv_regras_contabilisticas (id, evento, classificacao, carteira, tipo_ativo, conta_debito, conta_credito) values
-  (1, 'Purchase', 'Any', 'Any', 'Bonds', 'Investimentos - custo do título', 'Depósitos à ordem'),
-  (2, 'Interest (EIR)', 'CA / JVORI', 'Any', 'Bonds', 'Juros a receber / prémio-desconto', 'Rendimentos de investimentos - juros'),
-  (3, 'Coupon received', 'Any', 'Any', 'Bonds', 'Depósitos à ordem', 'Juros a receber'),
-  (4, 'Fair value change', 'JVORI', 'Any', 'Bonds', 'Investimentos - ajustamento de justo valor', 'Reserva de justo valor'),
-  (5, 'Fair value change', 'JVR', 'Any', 'Any', 'Investimentos - ajustamento de justo valor', 'Ganhos líquidos de ativos a JVR'),
-  (6, 'ECL charge', 'JVORI', 'Any', 'Bonds', 'Perdas de imparidade', 'Reserva de justo valor'),
-  (7, 'ECL charge', 'CA', 'Any', 'Bonds', 'Perdas de imparidade', 'Imparidade acumulada'),
-  (8, 'Sale - recycling', 'JVORI', 'Any', 'Bonds', 'Reserva de justo valor', 'Ganhos realizados em investimentos'),
-  (9, 'Sale - OCI transfer', 'JVORI-AC', 'Any', 'Equity', 'Reserva de justo valor', 'Resultados transitados'),
-  (10, 'Dividend', 'Any', 'Any', 'Equity', 'Dividendos a receber', 'Rendimentos de investimentos - dividendos');
+  (1, 'Purchase', 'Any', 'Any', 'Debt securities', '20/22/23 · Títulos de dívida (conta da classificação)', '51 Depósitos à ordem'),
+  (2, 'Interest (EIR)', 'CA / FVOCI', 'Any', 'Debt securities', '20/22/23 · Títulos de dívida (juros e amortização do prémio ou desconto)', '74 Rendimentos de investimentos'),
+  (3, 'Coupon received', 'Any', 'Any', 'Debt securities', '51 Depósitos à ordem', '20/22/23 · Títulos de dívida (juros corridos)'),
+  (4, 'Fair value change', 'FVOCI', 'Any', 'Debt securities', '20/22/23 · Ativos ao justo valor através de reservas', '11 01 Reservas de reavaliação (dívida ao justo valor através de reservas)'),
+  (5, 'Fair value change', 'FVTPL', 'Any', 'Any', '20/22/23 · Ativos ao justo valor através de resultados', '75 Ganhos em investimentos (65 Perdas, se negativa)'),
+  (6, 'ECL charge', 'FVOCI', 'Any', 'Debt securities', '66 Perdas por imparidade', '11 2 Provisão para perdas de crédito previstas'),
+  (7, 'ECL charge', 'CA', 'Any', 'Debt securities', '66 Perdas por imparidade', '29 Imparidade acumulada (custo amortizado)'),
+  (8, 'ECL reversal', 'CA / FVOCI', 'Any', 'Debt securities', '29 / 11 2', '76 Reversão de perdas por imparidade'),
+  (9, 'Sale - reclassification adjustment', 'FVOCI', 'Any', 'Debt securities', '11 01 Reservas de reavaliação', '75 Ganhos em investimentos (65 Perdas), repartido por carteira (R-55)'),
+  (10, 'Sale - transfer within equity', 'FVOCI-EQ', 'Any', 'Equity', '11 08 Reservas de reavaliação (capital próprio)', '19 Resultados transitados'),
+  (11, 'Dividend', 'Any', 'Any', 'Equity', '51 Depósitos à ordem', '74 Rendimentos de investimentos'),
+  (12, 'Transfer between portfolios', 'Any', 'Different account class', 'Any', 'Classe da carteira de destino (20/21/22/23)', 'Classe da carteira de origem, pelo valor contabilizado (R-53, R-54)');
 insert into public.inv_pd (rating, pd_12m, ordem) values
   ('AAA', 0.0001, 0),
   ('AA+', 0.0002, 1),

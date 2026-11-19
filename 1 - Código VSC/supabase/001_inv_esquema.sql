@@ -32,6 +32,7 @@ create table if not exists public.inv_carteiras (
   tipo text not null,
   afeto boolean not null,
   ramo text,
+  classe_contas text not null default '23' check (classe_contas in ('20','21','22','23')),
   modelo_negocio text not null,
   carteira_sii text not null,
   provisoes_tecnicas numeric(18,2) not null default 0,
@@ -83,7 +84,7 @@ create table if not exists public.inv_lotes (
   quantidade numeric(18,2) not null,
   quantidade_inicial numeric(18,2),
   preco_aquisicao numeric(18,6) not null,
-  classificacao text not null check (classificacao in ('CA','JVORI','JVORI-AC','JVR')),
+  classificacao text not null check (classificacao in ('CA','FVOCI','FVOCI-EQ','FVTPL')),
   rating_aquisicao text
 );
 
@@ -210,7 +211,7 @@ begin
     'dataRef', (select valor #>> '{}' from public.inv_parametros where chave = 'data_ref'),
     'periodo', (select valor #>> '{}' from public.inv_parametros where chave = 'periodo'),
     'entidade', (select jsonb_build_object('id', id, 'nome', nome, 'moeda', moeda, 'metodoLotes', metodo_lotes) from public.inv_entidades order by id limit 1),
-    'carteiras', coalesce((select jsonb_agg(jsonb_strip_nulls(jsonb_build_object('id', id, 'nome', nome, 'tipo', tipo, 'afeto', afeto, 'ramo', ramo, 'modelo', modelo_negocio, 'sii', carteira_sii, 'pt', provisoes_tecnicas, 'rff', fundo_autonomo)) order by ordem) from public.inv_carteiras), '[]'),
+    'carteiras', coalesce((select jsonb_agg(jsonb_strip_nulls(jsonb_build_object('id', id, 'nome', nome, 'tipo', tipo, 'afeto', afeto, 'ramo', ramo, 'classe', classe_contas, 'modelo', modelo_negocio, 'sii', carteira_sii, 'pt', provisoes_tecnicas, 'rff', fundo_autonomo)) order by ordem) from public.inv_carteiras), '[]'),
     'emitentes', coalesce((select jsonb_object_agg(id, jsonb_strip_nulls(jsonb_build_object('nome', nome, 'tipo', tipo, 'pais', pais, 'nace', nace, 'rating', rating, 'ratingAnt', rating_anterior, 'grupo', grupo))) from public.inv_emitentes), '{}'),
     'instrumentos', coalesce((select jsonb_agg(jsonb_strip_nulls(jsonb_build_object('id', id, 'isin', coalesce(isin, ''), 'codigo', codigo, 'nome', nome, 'tipo', tipo, 'em', emitente_id, 'cic', cic, 'taxa', taxa, 'freq', frequencia, 'base', base_dias,
         'emissao', data_emissao, 'venc', data_vencimento, 'nom', nominal_unitario, 'preco', preco, 'nivel', nivel_jv, 'sppi', sppi, 'fonte', fonte_preco, 'excecao', excecao_preco, 'manual', nullif(preco_manual, false), 'relacao', relacao, 'pct', participacao)) order by ordem) from public.inv_instrumentos), '[]'),

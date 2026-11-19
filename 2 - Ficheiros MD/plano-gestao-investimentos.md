@@ -29,6 +29,8 @@ Estado a 19 de novembro de 2026. A especificação funcional está em `especific
 | Motor de cálculo | Biblioteca isolada (`inv-motor.js`), testável em Node | Permite levar o mesmo código para o servidor |
 | Entrada e dados | Ecrã de entrada só com nome de utilizador, como no ON. Os dados vêm do Supabase (mesmo projeto do ON, tabelas `inv_`). Para já só `andreborges` tem acesso | Indicação do André, 19 de novembro de 2026 |
 | Segurança no Supabase | Tabelas com RLS e sem permissões. O navegador só chama 4 funções que confirmam o utilizador: entrar, ler os dados, aprovar/rejeitar e reafetar. Quem pediu não aprova, também no servidor (R-18) | As tabelas não ficam expostas com a chave pública |
+| Terminologia | Termos de `glossario-termos.md`: termo português no texto e termo ou sigla inglesa entre parênteses quando o mercado o usa. Categorias da IFRS 9 com os nomes do PCES ("justo valor através de reservas") e siglas CA, FVOCI, FVTPL | Análise da IFRS 9 em português, do PCES (NR 9/2022-R) e de relatórios de seguradoras portuguesas, pedido do André a 19 de novembro de 2026 |
+| PCES em vigor | Norma Regulamentar n.º 9/2022-R (a NR 10/2016-R foi revogada). Tipos de carteira da tabela 9, classes de contas 20/21/22/23, transferências pelo valor contabilizado e reserva repartida por carteira (R-53 a R-55) | Texto da norma |
 | Gravação | Aprovar, rejeitar e submeter reafetações gravam no Supabase e ficam no trilho. Os restantes botões continuam a ser demonstração | Primeiro passo; o resto segue o mesmo padrão |
 
 ## Estado
@@ -46,7 +48,7 @@ Estado a 19 de novembro de 2026. A especificação funcional está em `especific
 ## Próximos passos
 
 1. Rever a especificação com o André e decidir as questões em aberto.
-2. Confirmar o texto normativo marcado **[a confirmar]** (NR 10/2016-R secções 5 e 6, PCES em vigor para IFRS 17 / IFRS 9, artigos do RJASR, taxonomia EIOPA do S.06.02).
+2. Confirmar o texto normativo ainda marcado **[a confirmar]**: termos de Solvência II no EUR-Lex (bloqueado ao acesso automático), artigo 152.º do RJASR, taxonomia EIOPA do S.06.02 e expressão da IFRS 17 para a opção de desagregação.
 3. Validar o mockup com 3 a 5 seguradoras e com um revisor oficial de contas do setor (análise de mercado, secção 6).
 4. Completar os cenários de teste C-03, C-04, C-06 a C-10 no motor (venda com custo médio, reafetação parcial, preço manual, segregação, período fechado, lançamentos equilibrados, reprodução).
 5. Desenhar as tabelas Dataverse e as permissões (secções 5 e 6).
@@ -59,7 +61,7 @@ Estado a 19 de novembro de 2026. A especificação funcional está em `especific
 | --- | --- | --- |
 | Q1 | Nome definitivo da plataforma | André |
 | Q2 | Interface em inglês ou em português | André |
-| Q3 | Plano de contas: PCES em vigor e contas concretas por evento | Cliente / contabilidade |
+| Q3 | Plano de contas: subcontas finais de cada seguradora dentro do PCES da NR 9/2022-R | Cliente / contabilidade |
 | Q4 | Método de custeio das vendas (custo médio ponderado ou FIFO) | Cliente |
 | Q5 | Fonte de preços e de ratings no MVP (ficheiro do custodiante ou fornecedor de dados) | Cliente |
 | Q6 | Participações em filiais e associadas nas contas individuais: custo, equivalência patrimonial ou justo valor | Cliente |

@@ -97,8 +97,8 @@
       r.ca = r.custoAq; r.jc = 0; r.jv = l.q * ins.preco; r.ecl = 0;
     }
     if (l.cl === 'CA') { r.contab = r.ca - r.ecl; r.reserva = 0; }
-    else if (l.cl === 'JVORI') { r.contab = r.jv; r.reserva = r.jv - r.ca + r.ecl; }
-    else if (l.cl === 'JVORI-AC') { r.contab = r.jv; r.reserva = r.jv - r.custoAq; }
+    else if (l.cl === 'FVOCI') { r.contab = r.jv; r.reserva = r.jv - r.ca + r.ecl; }
+    else if (l.cl === 'FVOCI-EQ') { r.contab = r.jv; r.reserva = r.jv - r.custoAq; }
     else { r.contab = r.jv; r.reserva = 0; }
     r.potencial = r.jv - (divida ? r.ca : r.custoAq);
     r.sii = r.jv + r.jc;
@@ -120,7 +120,7 @@
     passos.push(['Amortised cost (clean)', 'Dirty − accrued interest', r.ca]);
     passos.push(['Fair value (clean)', 'Nominal × ' + ins.preco + '% (' + ins.fonte + ', level ' + ins.nivel + ')', r.jv]);
     passos.push(['ECL', 'EAD × PD × LGD = ' + Math.round(r.ead) + ' × ' + (r.pd * 100).toFixed(4) + '% × ' + (r.lgd * 100) + '% · stage ' + r.estagio, r.ecl]);
-    if (l.cl === 'JVORI') passos.push(['Fair value reserve (OCI)', 'Fair value − amortised cost + ECL (R-37, C-05)', r.reserva]);
+    if (l.cl === 'FVOCI') passos.push(['Fair value reserve (account 11)', 'Fair value − amortised cost + ECL (R-37, C-05)', r.reserva]);
     var fl = fluxos(ins).filter(function (x) { return x.data > ref; }).map(function (x) {
       var v = l.q * (x.cupao + x.capital), t = tempo(ins, ref, x.data);
       return { data: x.data, cupao: l.q * x.cupao, capital: l.q * x.capital, t: t, fd: 1 / Math.pow(1 + r.tje, t), vp: v / Math.pow(1 + r.tje, t) };
@@ -128,6 +128,21 @@
     return { r: r, passos: passos, fluxos: fl };
   }
 
-  var M = { d: d, iso: iso, dias: dias, addMeses: addMeses, fluxos: fluxos, juroCorrido: juroCorrido, tje: tje, vp: vp, estagio: estagio, ig: ig, lote: lote, lotes: lotes, explicar: explicar };
+  /* Transferencia entre carteiras pelo valor contabilizado (R-53, NR 9/2022-R ponto 5 n.º 2): quantia escriturada mais juros corridos */
+  function valorTransferencia(INV, l, data, q) {
+    var r = lote(INV, l, data), f = (q == null ? l.q : q) / l.q;
+    return { valor: (r.contab + r.jc) * f, reserva: r.reserva * f };
+  }
+
+  /* Reserva de justo valor por carteira (R-55, NR 9/2022-R ponto 5 n.os 5 a 7). movimentos = [{ carteira, ajustamento }] pela ordem em que
+     o lote passou pelas carteiras. Cada carteira fica com os ajustamentos reconhecidos enquanto teve o ativo; na venda, o ajustamento de
+     reclassificacao para resultados reparte-se pelo mesmo montante */
+  function repartirReserva(movimentos) {
+    var porCarteira = {}, total = 0;
+    movimentos.forEach(function (m) { porCarteira[m.carteira] = (porCarteira[m.carteira] || 0) + m.ajustamento; total += m.ajustamento; });
+    return { total: total, porCarteira: porCarteira };
+  }
+
+  var M = { valorTransferencia: valorTransferencia, repartirReserva: repartirReserva, d: d, iso: iso, dias: dias, addMeses: addMeses, fluxos: fluxos, juroCorrido: juroCorrido, tje: tje, vp: vp, estagio: estagio, ig: ig, lote: lote, lotes: lotes, explicar: explicar };
   if (typeof module !== 'undefined' && module.exports) module.exports = M; else raiz.MOTOR = M;
 })(this);

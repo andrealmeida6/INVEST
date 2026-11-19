@@ -24,7 +24,7 @@
       '<div class="ps-est-bar">' + INV.carteiras.map(function (c) { return '<i class="' + cores[c.id] + '" style="width:' + (soma(porCart(c.id), 'sii') / TOT * 100).toFixed(2) + '%"></i>'; }).join('') + '</div>' +
       '<div class="ps-est-n iv-est-4">' + INV.carteiras.map(function (c) {
         var v = soma(porCart(c.id), 'sii');
-        return '<a class="ps-est-i" href="/carteiras/" style="text-decoration:none"><span><i class="' + cores[c.id] + '" style="display:inline-block;margin-right:6px"></i>' + e(c.id === 'LIVRES' ? 'Livres' : c.nome) + '</span><b>' + APP.mi(v) + '</b>' + (c.pt ? '<span>Coverage ' + APP.pct(v / c.pt, 0) + '</span>' : '<span>Not allocated</span>') + '</a>';
+        return '<a class="ps-est-i" href="/carteiras/" style="text-decoration:none"><span><i class="' + cores[c.id] + '" style="display:inline-block;margin-right:6px"></i>' + e(c.nome) + '</span><b>' + APP.mi(v) + '</b>' + (c.pt ? '<span>Coverage ' + APP.pct(v / c.pt, 0) + '</span>' : '<span>Not allocated</span>') + '</a>';
       }).join('') + '</div>' +
       '<span class="ps-est-s">Book value ' + APP.mi(soma(L, 'contab')) + ' · fair value ' + APP.mi(soma(L, 'jv')) + ' · ' + L.length + ' lots in ' + INV.instrumentos.length + ' instruments</span></div>';
   };
@@ -180,7 +180,7 @@
       var ls = porCart(c.id), v = soma(ls, 'sii'), classes = {};
       ls.forEach(function (r) { var k = TIPO[r.ins.tipo]; classes[k] = (classes[k] || 0) + r.sii; });
       var cob = c.pt ? v / c.pt : null;
-      return APP.card(e(c.nome), '<div class="ps-sp">' + APP.chip(c.tipo, c.afeto ? 'info' : '') + '<span class="ps-tag">' + e(c.modelo) + '</span><span class="ps-tag">S.06.02: ' + e(c.sii) + '</span>' + (c.rff ? '<span class="ps-tag">' + e(c.rff) + '</span>' : '') + '</div>' +
+      return APP.card(e(c.nome), '<div class="ps-sp">' + APP.chip(c.tipo, c.afeto ? 'info' : '') + '<span class="ps-tag">' + e(c.modelo) + '</span><span class="ps-tag">PCES class ' + e(c.classe) + '</span><span class="ps-tag">S.06.02: ' + e(c.sii) + '</span>' + (c.rff ? '<span class="ps-tag">' + e(c.rff) + '</span>' : '') + '</div>' +
         '<div class="ps-kpis iv-kpis3 ps-mt">' + APP.kpi('Solvency II value', APP.mi(v)) + APP.kpi('Book value', APP.mi(soma(ls, 'contab'))) + (c.pt ? APP.kpi('Coverage', APP.pct(cob, 1), 'Technical provisions ' + APP.mi(c.pt), cob < 1 ? 'k-err' : 'k-ok') : APP.kpi('Lots', ls.length)) + '</div>' +
         (c.pt ? '<div class="ps-mt"><span class="ps-small ps-mut">Allocated assets vs technical provisions (R-17)</span>' + APP.barra(v, c.pt * 1.25, c.pt) + '</div>' : '') +
         '<ul class="iv-comp">' + Object.keys(classes).map(function (k) { return '<li><span>' + e(k) + '</span><b>' + APP.pct(classes[k] / v, 1) + '</b></li>'; }).join('') + '</ul>',
@@ -219,7 +219,7 @@
   var nf = { lote: 'L012', q: 1000000, para: 'PPR' };
   function impacto() {
     var r = L.filter(function (x) { return x.lote.id === nf.lote; })[0];
-    var q = Math.min(+nf.q || 0, r.q), v = r.sii * q / r.q;
+    var q = Math.min(+nf.q || 0, r.q), v = MOTOR.valorTransferencia(INV, r.lote, REF, q).valor;
     var de = cart(r.cart), para = cart(nf.para);
     var linha = function (c, delta) {
       var a = soma(porCart(c.id), 'sii');
@@ -231,7 +231,7 @@
     if (nf.para === 'PPR' && r.em.nome === 'Banco B') { var pp = soma(porCart('PPR'), 'sii'), bb = soma(porCart('PPR').filter(function (x) { return x.em.nome === 'Banco B'; }), 'sii'); var lim = INV.limites.filter(function (x) { return x.base === 'Carteira PPR'; })[0], dep = (bb + v) / (pp + v); avisos.push('Limit "' + e(lim.dim) + '": Banco B goes from ' + APP.pct(bb / pp, 1) + ' to ' + APP.pct(dep, 1) + ' (alert ' + APP.pct(lim.alerta, 0) + ', max ' + APP.pct(lim.max, 0) + ').'); }
     if (r.cart === nf.para) avisos = ['Origin and destination are the same portfolio.'];
     return '<table class="ps-t"><thead><tr><th>Portfolio</th><th class="dir">Before</th><th class="dir">After</th><th class="dir">Coverage</th></tr></thead><tbody>' + linha(de, -v) + (r.cart !== nf.para ? linha(para, v) : '') + '</tbody></table>' +
-      '<p class="ps-small ps-mut ps-mt">Moves ' + qtd(r.ins, q) + ' at Solvency II value ' + eur(v) + '. Cost, EIR, classification and stage of the lot are kept: a reallocation is not a sale (R-23).</p>' +
+      '<p class="ps-small ps-mut ps-mt">Moves ' + qtd(r.ins, q) + ' at book value ' + eur(v) + ' (NR 9/2022-R, point 5: transfers are made at the carrying amount, with no gain or loss). Cost, EIR, classification and stage of the lot are kept: a reallocation is not a sale and does not by itself reclassify (R-23).' + (de.classe !== para.classe ? ' Generates an entry from account class ' + e(de.classe) + ' to ' + e(para.classe) + ' (R-54).' : '') + ' Fair value adjustments up to the transfer date stay with ' + e(de.nome) + '; later ones go to ' + e(para.nome) + ' (R-55).</p>' +
       avisos.map(function (a) { return '<div class="ps-aviso warn">' + a + '</div>'; }).join('');
   }
   B['afetacoes'] = function () {
@@ -323,7 +323,7 @@
 
   /* ---------------- Imparidade ---------------- */
   B['imparidade'] = function () {
-    var ls = L.filter(function (r) { return divida(r.ins) && r.cl !== 'JVR'; });
+    var ls = L.filter(function (r) { return divida(r.ins) && r.cl !== 'FVTPL'; });
     var s1 = ls.filter(function (r) { return r.estagio === 1; }), s2 = ls.filter(function (r) { return r.estagio === 2; });
     return '<div class="ps-kpis iv-kpis">' + APP.kpi('Stage 1 · 12-month ECL', eur(soma(s1, 'ecl')), s1.length + ' lots') + APP.kpi('Stage 2 · lifetime ECL', eur(soma(s2, 'ecl')), s2.length + ' lot(s) · pending approval', 'k-warn') + APP.kpi('Stage 3 · credit-impaired', eur(0), '0 lots') + APP.kpi('Movement of the period', eur(soma(s2, function (r) { return r.ecl - r.ecl1; })), 'Stage transfer Energia C', 'k-err') + '</div>' +
       APP.card('ECL by lot · ' + APP.dt(REF), APP.tabela([
@@ -359,6 +359,11 @@
   };
 
   /* ---------------- Contabilidade ---------------- */
+  /* Contas do PCES pela afetacao do lote (classe 20 Vida, 22 Nao Vida, 23 nao afetos) e pela classificacao */
+  var SUB = { 20: '0', 21: '1', 22: '2', 23: '3' };
+  var CLC = { CA: 'ao custo amortizado', FVOCI: 'ao justo valor através de reservas', 'FVOCI-EQ': 'ao justo valor através de reservas', FVTPL: 'ao justo valor através de resultados' };
+  var contaTitulo = function (r) { var k = cart(r.cart).classe; return k + ' · Títulos de dívida ' + CLC[r.cl]; };
+  var contaRend = function (n, r) { return n + ' ' + SUB[cart(r.cart).classe] + ' ' + ({ 74: 'Rendimentos de investimentos', 66: 'Perdas por imparidade' })[n]; };
   function lancamentos() {
     var ant = MOTOR.addMeses(REF, -1), out = [];
     L.forEach(function (r) {
@@ -366,9 +371,17 @@
       var a = MOTOR.lote(INV, r.lote, ant), recebido = 0;
       MOTOR.fluxos(r.ins).forEach(function (f) { if (f.data > ant && f.data <= REF) recebido += r.q * (f.cupao + f.capital); });
       var juro = r.caSujo - a.caSujo + recebido;
-      out.push({ ev: 'Interest (EIR)', ref: r.lote.id, ins: r.ins.nome, d: 'Juros a receber / prémio-desconto', c: 'Rendimentos de investimentos - juros', v: juro, cl: r.cl });
-      if (recebido) out.push({ ev: 'Coupon received', ref: r.lote.id, ins: r.ins.nome, d: 'Depósitos à ordem', c: 'Juros a receber', v: recebido, cl: r.cl });
-      if (r.estagio === 2) out.push({ ev: 'ECL charge', ref: r.lote.id, ins: r.ins.nome, d: 'Perdas de imparidade', c: r.cl === 'CA' ? 'Imparidade acumulada' : 'Reserva de justo valor', v: r.ecl - r.ecl1, cl: r.cl });
+      out.push({ ev: 'Interest (EIR)', ref: r.lote.id, ins: r.ins.nome, d: contaTitulo(r), c: contaRend(74, r), v: juro, cl: r.cl });
+      if (recebido) out.push({ ev: 'Coupon received', ref: r.lote.id, ins: r.ins.nome, d: '51 Depósitos à ordem', c: contaTitulo(r), v: recebido, cl: r.cl });
+      if (r.estagio === 2) out.push({ ev: 'ECL charge', ref: r.lote.id, ins: r.ins.nome, d: contaRend(66, r), c: r.cl === 'CA' ? '29 Imparidade acumulada' : '11 2 Provisão para perdas de crédito previstas', v: r.ecl - r.ecl1, cl: r.cl });
+    });
+    /* Transferencias aprovadas no periodo entre classes de contas diferentes, pelo valor contabilizado (R-53, R-54) */
+    INV.afetacoes.forEach(function (af) {
+      if (af.estado !== 'Approved' || af.data <= ant || af.data > REF || af.de === '-') return;
+      var de = cart(af.de), para = cart(af.para), lt = INV.lotes.filter(function (x) { return x.id === af.lote; })[0];
+      if (!lt || de.classe === para.classe) return;
+      var t = MOTOR.valorTransferencia(INV, lt, af.data, af.q), ins = insP(lt.i);
+      out.push({ ev: 'Transfer ' + af.id, ref: lt.id, ins: ins.nome, d: para.classe + ' · ' + para.nome, c: de.classe + ' · ' + de.nome, v: t.valor, cl: lt.cl });
     });
     return out;
   }
@@ -464,8 +477,8 @@
     if (abaB === 'regras') corpo = '<p class="ps-mut">Event × IFRS 9 class × portfolio type × asset type → accounts (R-42). The accounts of the chart of accounts in force are loaded as data, not code. Changes need approval and are versioned with start and end dates.</p>' + APP.tabela([
       { t: 'Event', k: function (r) { return '<b>' + e(r.ev) + '</b>'; } }, { t: 'Class', k: function (r) { return e(r.cl); } }, { t: 'Portfolio', k: function (r) { return e(r.cart); } }, { t: 'Asset', k: function (r) { return e(r.at); } }, { t: 'Debit', k: function (r) { return e(r.d); } }, { t: 'Credit', k: function (r) { return e(r.c); } }
     ], INV.regras);
-    else if (abaB === 'carteiras') corpo = APP.tabela([{ t: 'Portfolio type', k: function (x) { return '<b>' + e(x[0]) + '</b>'; } }, { t: 'Allocated', k: function (x) { return x[1]; } }, { t: 'Rule', k: function (x) { return e(x[2]); } }],
-      [['Afetos - Vida', 'Yes', 'Coverage of life technical provisions'], ['Afetos - Não Vida', 'Yes', 'Coverage of non-life technical provisions'], ['Afetos - fundo autónomo', 'Yes', 'Reallocation always needs approval (R-16)'], ['Afetos - unit-linked', 'Yes', 'Assets held in unit-linked'], ['Não afetos (livres)', 'No', '-']]) +
+    else if (abaB === 'carteiras') corpo = '<p class="ps-mut">Portfolio types from table 9 of the chart of accounts (PCES, ASF Regulatory Standard 9/2022-R). Sub-portfolios always sit inside one of them, so entries and PCES maps come out right.</p>' + APP.tabela([{ t: 'Portfolio type (table 9)', k: function (x) { return '<b>' + e(x[0]) + '</b>'; } }, { t: 'Account class', k: function (x) { return x[1]; } }, { t: 'Rule', k: function (x) { return e(x[2]); } }],
+      [['a) Vida com participação nos resultados, sem investimento autónomo', '20', 'Transfers with profit sharing: reserve split by portfolio (R-55)'], ['b) Vida com participação nos resultados, com investimento autónomo (por fundo autónomo)', '20', 'Reallocation always needs approval (R-16)'], ['c) Componente de depósito e contratos de investimento (por fundo autónomo)', '21', '-'], ['d) Outros seguros de vida, sem investimento autónomo', '20', '-'], ['e) Outros seguros de vida, com investimento autónomo (por fundo autónomo)', '20', 'Reallocation always needs approval (R-16)'], ['f) Seguro de acidentes de trabalho', '22', '-'], ['g) Restantes seguros não vida', '22', '-'], ['h) Valores livres', '23', 'Not allocated']]) +
       '<h3 class="iv-h3">Dimensions</h3><div class="ps-sp">' + ['Ramo', 'Produto', 'Fundo', 'Natureza das responsabilidades', 'Grupo de contratos IFRS 17'].map(function (d) { return '<span class="ps-tag">' + d + '</span>'; }).join('') + '</div>';
     else if (abaB === 'ecl') corpo = '<div class="ps-grid2">' + APP.tabela([{ t: 'Rating', k: function (k) { return '<b>' + k + '</b>'; } }, { t: 'PD 12 months', dir: 1, k: function (k) { return APP.pct(INV.pd12[k], 2); } }], Object.keys(INV.pd12)) + APP.tabela([{ t: 'Issuer type', k: function (k) { return '<b>' + e(k) + '</b>'; } }, { t: 'LGD', dir: 1, k: function (k) { return APP.pct(INV.lgd[k], 0); } }], Object.keys(INV.lgd)) + '</div><p class="ps-small ps-mut ps-mt">Illustrative values. Stage criteria: loss of investment grade, 3 notches down, more than 30 days past due, manual watch list (R-07).</p>';
     else if (abaB === 'precos') corpo = APP.tabela([{ t: 'Asset class', k: function (x) { return '<b>' + e(x[0]) + '</b>'; } }, { t: 'Max daily change', dir: 1, k: function (x) { return x[1]; } }, { t: 'Stale after', dir: 1, k: function (x) { return x[2]; } }, { t: 'Source hierarchy', k: function (x) { return e(x[3]); } }],

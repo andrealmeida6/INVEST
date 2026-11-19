@@ -18,7 +18,7 @@
     var m = { Done: 'ok', 'To do': '', Approved: 'ok', 'Pending approval': 'rev', Draft: '', Rejected: 'err', Reversed: 'err', Open: 'warn', Justified: 'info', ok: 'ok', warn: 'warn', todo: '', err: 'err' };
     return APP.chip(s, m[s] == null ? '' : m[s]);
   };
-  APP.CL = { CA: 'Amortised cost', JVORI: 'FVOCI', 'JVORI-AC': 'FVOCI equity', JVR: 'FVTPL' };
+  APP.CL = { CA: 'Amortised cost', FVOCI: 'FVOCI', 'FVOCI-EQ': 'FVOCI equity', FVTPL: 'FVTPL' };
   APP.clChip = function (cl) { return '<span class="ps-tag" title="' + APP.e(APP.CL[cl]) + '">' + APP.e(APP.CL[cl] || cl) + '</span>'; };
 
   /* Tabela: cols = [{t, k(r) -> html, dir, l}] ; cada td leva data-l para virar cartao no telemovel */

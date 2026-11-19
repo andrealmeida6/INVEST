@@ -17,8 +17,8 @@ perto('C-01 custo amortizado apos o vencimento', M.lote(INV, l1, '2029-01-01').c
 // C-02 juro corrido ACT/ACT ICMA
 perto('C-02 juro corrido 2026-07-02', 1000000 * M.juroCorrido(obr, '2026-07-02'), 14958.90, 0.005);
 
-// C-05 JVORI: reserva = justo valor - custo amortizado + ECL
-const l5 = Object.assign({}, l1, { cl: 'JVORI' });
+// C-05 FVOCI: reserva = justo valor - custo amortizado + ECL
+const l5 = Object.assign({}, l1, { cl: 'FVOCI' });
 const r5 = M.lote(INV, l5, '2027-01-01');
 perto('C-05 reserva (sem o ECL)', r5.reserva - r5.ecl, 990000 - 981139.05, 0.05);
 perto('C-05 valor de balanco = justo valor', r5.contab, 990000, 0.001);
@@ -27,6 +27,16 @@ perto('C-05 valor de balanco = justo valor', r5.contab, 990000, 0.001);
 const ok = (nome, cond) => { if (!cond) falhas++; console.log((cond ? 'ok   ' : 'FALHA') + ' ' + nome); };
 ok('Estagio 2 ao perder investment grade (BBB -> BB+)', M.estagio('BBB', 'BB+') === 2);
 ok('Estagio 1 com baixo risco de credito (A -> BBB)', M.estagio('A', 'BBB') === 1);
+
+// C-11 repartição da reserva entre carteiras (R-55): +30 000 na carteira A até à transferência, −5 000 depois em B
+const rep = M.repartirReserva([{ carteira: 'A', ajustamento: 30000 }, { carteira: 'B', ajustamento: -5000 }]);
+perto('C-11 ajustamento de reclassificação total', rep.total, 25000, 0.001);
+perto('C-11 parte da carteira A', rep.porCarteira.A, 30000, 0.001);
+perto('C-11 parte da carteira B', rep.porCarteira.B, -5000, 0.001);
+
+// R-53 transferência pelo valor contabilizado (quantia escriturada + juros corridos), sem ganho nem perda
+const t53 = M.valorTransferencia(INV, l5, '2026-07-02', 300000), r53 = M.lote(INV, l5, '2026-07-02');
+perto('R-53 valor de transferência de 300 000 = 30% do valor contabilizado', t53.valor, 0.3 * (r53.contab + r53.jc), 0.001);
 
 console.log(falhas ? falhas + ' falha(s)' : 'Todos os cenarios passam');
 process.exit(falhas ? 1 : 0);

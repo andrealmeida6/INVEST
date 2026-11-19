@@ -9,7 +9,8 @@ Plataforma de administração, controlo e contabilização de carteiras de inves
 3. Coloca os agentes em `4 - Agentes/`.
 4. Para cada plano, atualiza o ficheiro `.md` de `2 - Ficheiros MD/` relacionado com o tema. Cria um novo apenas se não existir nenhum relacionado.
 5. Qualquer regra de cálculo nova ou alterada tem um cenário com números na secção 24 da especificação e um teste em `1 - Código VSC/testes/`. Corre `node testes/motor.test.js` dentro de `1 - Código VSC/` antes de terminar.
-6. Pontos normativos que não foi possível confirmar no texto em vigor ficam marcados **[a confirmar]** na especificação. Não os dês como certos.
+6. Usa os termos de `2 - Ficheiros MD/glossario-termos.md`. Termo novo: acrescenta-o lá com a fonte portuguesa.
+7. Pontos normativos que não foi possível confirmar no texto em vigor ficam marcados **[a confirmar]** na especificação. Não os dês como certos.
 
 ## Estrutura
 

@@ -2,6 +2,8 @@
 
 Estado a 19 de novembro de 2026. Primeira versão, feita a partir do documento de requisitos do André ("Enquadramento e princípios de desenho") e de pesquisa técnica, contabilística e de mercado. A análise de mercado está em `analise-mercado.md` e o plano em `plano-gestao-investimentos.md`.
 
+A terminologia segue `glossario-termos.md` (IFRS 9 em português, PCES da ASF e relatórios de seguradoras portuguesas): termo português no texto, termo ou sigla em inglês entre parênteses quando o mercado o usa.
+
 Os pontos marcados **[a confirmar]** dependem de texto normativo que não foi possível ler na íntegra nesta fase (Diário da República e site da ASF não estavam acessíveis a partir do ambiente de trabalho) ou de decisão do cliente.
 
 ---
@@ -39,7 +41,7 @@ O problema que resolve: nas seguradoras pequenas e médias, a carteira vive hoje
 | P5 | Quatro olhos | Operações, preços manuais, reafetações e alterações de parâmetros têm aprovação por uma pessoa diferente de quem registou |
 | P6 | Multi-entidade desde o início | Todas as tabelas têm entidade legal, mesmo que o primeiro cliente tenha só uma |
 | P7 | Integração por ficheiro primeiro, API depois | Importações com modelo, validação e pré-visualização. A API usa o mesmo motor de validação |
-| P8 | Explicar cada número | Qualquer valor (custo amortizado, juro corrido, ECL, mais-valia) abre o cálculo passo a passo, com as datas e as taxas usadas |
+| P8 | Explicar cada número | Qualquer valor (custo amortizado, juros corridos, ECL, mais-valia) abre o cálculo passo a passo, com as datas e as taxas usadas |
 | P9 | Bitemporalidade | Distinguir a data a que um facto diz respeito (data efetiva) da data em que foi registado. Permite reproduzir qualquer fecho passado |
 
 ## 3. Glossário
@@ -51,17 +53,20 @@ O problema que resolve: nas seguradoras pequenas e médias, a carteira vive hoje
 | Lote | Cada aquisição de um instrumento numa carteira. Tem custo, data, taxa efetiva e classificação próprios. As vendas consomem lotes |
 | Posição | Soma dos lotes de um instrumento numa carteira, numa data. Calculada, nunca introduzida |
 | Carteira | Agrupamento de lotes, ligado a uma entidade legal e a um tipo de afetação |
-| Afetação | Ligação de um lote (ou parte) a uma carteira de ativos afetos às responsabilidades (provisões técnicas) de um ramo, produto ou fundo |
-| Ativos livres | Ativos não afetos a responsabilidades |
-| Custo amortizado | Valor do ativo pelo método da taxa de juro efetiva (TJE), líquido de imparidade |
+| Afetação | Ligação de um lote (ou parte) a uma carteira de investimentos afetos aos passivos de contratos de seguros de um ramo, produto ou fundo autónomo (NR 9/2022-R, ponto 4) |
+| Valores livres | Investimentos não afetos (tabela 9 do PCES; classe 23) |
+| Custo amortizado (CA) | Quantia escriturada bruta pelo método do juro efetivo, menos a provisão para perdas |
 | TJE | Taxa de juro efetiva: a taxa que iguala os fluxos futuros ao valor de aquisição (incluindo custos de transação) |
-| Juro corrido | Juro do cupão em curso desde a última data de pagamento até à data de referência |
-| ECL | Perdas de crédito esperadas (IFRS 9), em 3 estágios |
-| SPPI | Teste "solely payments of principal and interest" da IFRS 9 |
-| CIC | Complementary Identification Code de Solvência II (4 carateres) |
-| QRT | Quantitative Reporting Templates de Solvência II |
-| TPT | Tripartite Template: ficheiro normalizado com a composição de fundos para look-through |
-| PCES | Plano de Contas para as Empresas de Seguros (ASF) |
+| Juros corridos | Juro do cupão em curso desde a última data de pagamento até à data de referência |
+| Perdas de crédito esperadas (ECL) | Imparidade da IFRS 9, em 3 estágios (*Stage 1/2/3*) |
+| FVOCI | Justo valor através de reservas (no texto da IFRS 9: através de outro rendimento integral) |
+| FVTPL | Justo valor através de resultados |
+| Teste SPPI | Fluxos de caixa que são apenas pagamentos de capital e juros sobre a quantia de capital em dívida (*solely payments of principal and interest*) |
+| CIC | Código de identificação complementar de Solvência II (4 carateres) |
+| QRT | Modelos de reporte quantitativo de Solvência II |
+| TPT | *Tripartite Template*: ficheiro normalizado com a composição de fundos para a abordagem baseada na transparência (*look-through*) |
+| PCES | Plano de Contas para as Empresas de Seguros (ASF, Norma Regulamentar n.º 9/2022-R) |
+| Provisões técnicas / passivos de contratos de seguros | O primeiro é o termo de Solvência II; o segundo, o da IFRS 17 e do PCES. Os ativos afetam-se aos passivos de contratos de seguros |
 
 ## 4. Enquadramento normativo
 
@@ -69,22 +74,22 @@ Esta secção resume as regras que a aplicação tem de cumprir. Cada tema é li
 
 ### 4.1 IFRS 9 - Classificação e mensuração
 
-Desde 2023 as seguradoras aplicam a IFRS 9 em conjunto com a IFRS 17 (fim da isenção temporária da IFRS 4).
+Desde 2023 as seguradoras aplicam a IFRS 9 em conjunto com a IFRS 17 (fim da isenção temporária da IFRS 4). Os nomes das categorias seguem o PCES (contas 20 23, 20 25, 20 20) e não o texto da norma, porque é o vocabulário das contas e dos relatórios das seguradoras.
 
 | Categoria | Quando | Mensuração | Variações de justo valor | Imparidade (ECL) |
 | --- | --- | --- | --- | --- |
-| Custo amortizado (CA) | Dívida, modelo de negócio "deter para receber" e passa o SPPI | Custo amortizado (TJE) | Não reconhecidas (só divulgadas) | Sim, reduz o valor do ativo |
-| Justo valor por outro rendimento integral (JVORI) - dívida | Dívida, modelo "deter para receber e vender" e passa o SPPI | Justo valor no balanço; juro pela TJE em resultados | Em reserva de justo valor (ORI), reciclada para resultados na venda | Sim, em ORI (não reduz o valor de balanço) |
-| JVORI - capital próprio | Ações, opção irrevogável instrumento a instrumento na aquisição | Justo valor | Em ORI, **sem reciclagem** na venda (transfere para resultados transitados) | Não |
-| Justo valor por resultados (JVR) | Restantes, incluindo dívida que falha o SPPI, fundos e designação para eliminar assimetria contabilística | Justo valor | Em resultados | Não |
+| Custo amortizado (CA) | Dívida, modelo de negócio "deter para recolher" (*Hold to collect*) e passa o SPPI | Custo amortizado (TJE) | Não reconhecidas (só divulgadas) | Sim, reduz o valor do ativo |
+| Justo valor através de reservas (FVOCI) - dívida | Dívida, modelo "deter para recolher e vender" (*Hold to collect and sell*) e passa o SPPI | Justo valor no balanço; juro pela TJE em resultados | Em reserva de justo valor (outro rendimento integral), reclassificada para resultados na venda | Sim, em reservas (não reduz o valor de balanço) |
+| Justo valor através de reservas (FVOCI) - capital próprio | Ações, opção irrevogável instrumento a instrumento na aquisição | Justo valor | Em reservas, **sem reclassificação para resultados** na venda (transfere para resultados transitados) | Não |
+| Justo valor através de resultados (FVTPL) | Restantes, incluindo dívida que falha o SPPI, unidades de participação em fundos e designação para eliminar uma incoerência na mensuração ou no reconhecimento (*accounting mismatch*) | Justo valor | Em resultados | Não |
 
 Regras para a aplicação:
 
-- **R-01** A classificação é atributo do **lote**, não do instrumento: a mesma obrigação pode estar em CA numa carteira e em JVR noutra.
+- **R-01** A classificação é atributo do **lote**, não do instrumento: a mesma obrigação pode estar em CA numa carteira e em FVOCI noutra.
 - **R-02** O teste SPPI é registado no instrumento, com resultado, data, responsável e justificação. Casos típicos que falham: obrigações convertíveis, inverse floaters, empréstimos participativos. As alterações à IFRS 9 de maio de 2024 (em vigor a 1 de janeiro de 2026) clarificam o tratamento de cláusulas ligadas a ESG (ex.: sustainability-linked bonds). O questionário SPPI deve ter essa pergunta.
 - **R-03** O modelo de negócio é atributo da **carteira** (ou subcarteira) e propõe a classificação dos lotes novos. A reclassificação entre categorias só acontece quando o modelo de negócio muda, o que é raro. Fica como operação com aprovação dupla, com efeito prospetivo a partir do primeiro dia do período seguinte.
-- **R-04** A opção JVORI para ações regista-se na aquisição e não se altera.
-- **R-05** A designação JVR para eliminar assimetria contabilística com passivos IFRS 17 regista-se na aquisição e não se altera.
+- **R-04** A opção FVOCI para ações regista-se na aquisição e não se altera.
+- **R-05** A designação FVTPL para eliminar uma incoerência na mensuração com passivos IFRS 17 regista-se na aquisição e não se altera.
 
 ### 4.2 IFRS 9 - Imparidade (ECL)
 
@@ -102,22 +107,22 @@ Para carteiras simples propõe-se um modelo parametrizável e explicável:
 
 ### 4.3 IFRS 13 - Justo valor
 
-- **R-10** Cada valorização guarda o nível de hierarquia: Nível 1 (preço cotado em mercado ativo), Nível 2 (dados observáveis, ex.: preço de contribuidor ou modelo com curva de mercado), Nível 3 (dados não observáveis, ex.: participações não cotadas avaliadas por DCF ou múltiplos).
-- **R-11** Para Nível 3 guarda-se a metodologia, os principais pressupostos e o relatório de avaliação. Alimenta as divulgações da IFRS 7 e da IFRS 13.
+- **R-10** Cada valorização guarda o nível de justo valor (hierarquia da IFRS 13; não confundir com os níveis de fundos próprios de Solvência II): nível 1 (preço cotado em mercado ativo), nível 2 (dados observáveis, ex.: preço de contribuidor ou modelo com curva de mercado), nível 3 (dados não observáveis, ex.: participações não cotadas avaliadas por DCF ou múltiplos).
+- **R-11** Para o nível 3 guarda-se a metodologia, os principais pressupostos e o relatório de avaliação. Alimenta as divulgações da IFRS 7 e da IFRS 13.
 
 ### 4.4 Interação com a IFRS 17
 
-A aplicação não calcula passivos, mas tem de ajudar a evitar assimetrias contabilísticas:
+A aplicação não calcula passivos, mas tem de ajudar a evitar incoerências na mensuração (*accounting mismatches*):
 
-- **R-12** Cada carteira afeta indica o grupo de contratos ou o ramo a que está afeta. Permite cruzar a opção de ORI dos gastos financeiros de seguros (IFRS 17) com a classificação dos ativos (JVORI ou JVR).
+- **R-12** Cada carteira afeta indica o grupo de contratos ou o ramo a que está afeta. Permite cruzar a opção de ORI dos gastos financeiros de seguros (IFRS 17) com a classificação dos ativos (FVOCI ou FVTPL).
 - **R-13** Para contratos com participação direta (abordagem VFA), a carteira de "itens subjacentes" é identificável e exporta o justo valor e o rendimento por período.
 
 ### 4.5 Solvência II
 
 - **Valorização (art. 75.º da Diretiva 2009/138/CE)**: os ativos são avaliados ao montante pelo qual poderiam ser transacionados. Na prática, justo valor, mesmo para títulos em CA no balanço IFRS. A aplicação guarda sempre dois valores por lote: **valor contabilístico IFRS** e **valor Solvência II**.
-- **Princípio do gestor prudente (art. 132.º)**: os investimentos têm de garantir segurança, qualidade, liquidez e rendibilidade da carteira no seu conjunto, e os ativos que cobrem provisões técnicas têm de ser adequados à natureza e duração das responsabilidades. Fundamenta os limites da secção 13.
+- **Princípio do gestor prudente (art. 132.º)**: os investimentos têm de garantir segurança, qualidade, liquidez e rendibilidade da carteira no seu conjunto, e os ativos que cobrem as provisões técnicas têm de ser adequados à natureza e duração das responsabilidades. Fundamenta os limites da secção 13.
 - **QRT S.06.02 - Lista de ativos**: lista título a título dos ativos detidos diretamente (categorias CIC 0 a 9). Campos que a aplicação tem de ter (lista de referência, a validar contra a taxonomia EIOPA em vigor **[a confirmar versão]**):
-  - Posição: código e tipo de identificação do ativo (ISIN preferencial), carteira (Vida, Não Vida, fundo autónomo, outro fundo interno, fundos próprios, geral), identificação do fundo autónomo (ring-fenced), ativo de unit-linked (sim/não), ativo dado em garantia, país de custódia, custodiante, quantidade, montante nominal, método de valorização, valor de aquisição, valor total Solvência II, juro corrido.
+  - Posição: código e tipo de identificação do ativo (ISIN preferencial), carteira (Vida, Não Vida, fundo autónomo, outro fundo interno, fundos próprios, geral), identificação do fundo autónomo (ring-fenced), ativo de unit-linked (sim/não), ativo dado em garantia, país de custódia, custodiante, quantidade, montante nominal, método de valorização, valor de aquisição, valor total Solvência II, juros corridos.
   - Instrumento: designação, nome e código (LEI) do emitente, setor do emitente (NACE), grupo do emitente e respetivo LEI, país do emitente, moeda, CIC, participação (filial, associada), rating externo, agência (ECAI), grau de qualidade de crédito, duração modificada, preço unitário Solvência II, preço em percentagem do nominal, data de vencimento.
 - **S.06.03 - Look-through de fundos**: composição por categoria, país e moeda. Alimenta-se do ficheiro TPT do gestor do fundo (fora do MVP, ver secção 23).
 - **S.09.01 - Rendimentos, ganhos e perdas do período**: dividendos, juros, rendas, ganhos e perdas realizados e não realizados por ativo. A aplicação tem os dados por construção (ver 10.6).
@@ -125,17 +130,18 @@ A aplicação não calcula passivos, mas tem de ajudar a evitar assimetrias cont
 
 ### 4.6 Regime português (ASF)
 
-- **Norma Regulamentar n.º 10/2016-R**: aprova o regime contabilístico das empresas de seguros e o **PCES**, e trata a **afetação de ativos às provisões técnicas** (secção 5) e as **transferências de ativos entre carteiras** (secção 6). A afetação deve ser coerente com o desenho dos produtos, sobretudo nos produtos de Vida cujos benefícios dependem do retorno dos investimentos.
-- **Norma Regulamentar n.º 3/2018-R**: alterou o PCES para acomodar a opção IFRS 9 / IAS 39.
-- **Alterações posteriores do PCES para IFRS 17 / IFRS 9** **[a confirmar a norma em vigor e o plano de contas atual]**. Por isso o plano de contas fica **parametrizável** e não fixo no código (P2).
-- **Regime Jurídico de Acesso e Exercício da Atividade Seguradora e Resseguradora (Lei n.º 147/2015)**: transpõe Solvência II, incluindo o princípio do gestor prudente **[a confirmar artigos]**.
+- **Norma Regulamentar n.º 9/2022-R, de 2 de novembro**: aprova o **PCES** adaptado à IFRS 17, aplicável desde o exercício de 2023, e revoga o PCES da Norma Regulamentar n.º 10/2016-R (e a alteração da n.º 3/2018-R). Regras que a aplicação tem de seguir:
+  - **Ponto 4 - Afetação de ativos aos passivos de contratos de seguros:** os investimentos da classe 2 têm de estar desagregados segundo a **tabela 9** do PCES. A afetação, sobretudo nos produtos Vida cujos benefícios dependem do retorno dos investimentos, deve ser consistente com o desenho dos produtos e as práticas de gestão, e tratar os tomadores, segurados e beneficiários de forma justa e proporcional, dentro de cada carteira e entre carteiras.
+  - **Ponto 5 - Transferências de ativos entre carteiras:** a empresa define os critérios de transferência para garantir equidade entre tomadores; a transferência faz-se **pelo valor contabilizado**; deve respeitar as NIC e os n.os 3 e 4 do artigo 152.º do RJASR; **não dá, por si só, lugar à reclassificação** dos instrumentos, salvo nos casos previstos na IFRS 9; os ajustamentos de valor **até à data da transferência ficam na carteira de origem** e os **posteriores vão para a carteira de destino**; na alienação de instrumentos de dívida ao justo valor através de reservas transferidos entre carteiras com participação nos resultados, **o ganho ou perda reparte-se pelas carteiras** segundo os ajustamentos de justo valor reconhecidos em cada uma.
+  - **Quadro de contas:** a afetação está nas contas. Classe 20 - Investimentos afetos aos passivos de contratos de seguros do ramo Vida; 21 - Investimentos relativos à componente de depósito e a contratos de investimento; 22 - Investimentos afetos aos passivos de contratos de seguros dos ramos Não Vida; 23 - Investimentos não afetos. Rendimentos (74), ganhos (75), perdas (65), perdas por imparidade (66) e reversões (76) desdobram-se pela mesma afetação. A reserva de justo valor é a conta 11 - Reservas de reavaliação.
+- **Regime Jurídico de Acesso e Exercício da Atividade Seguradora e Resseguradora (Lei n.º 147/2015)**: transpõe Solvência II, incluindo o princípio do gestor prudente; o artigo 152.º é referido pela NR 9/2022-R para as transferências entre carteiras **[a confirmar o conteúdo dos n.os 3 e 4]**.
 
 Requisitos que daqui resultam:
 
-- **R-14** Carteiras de ativos afetos por: Vida, Não Vida, patrimónios autónomos / fundos autónomos, produtos com participação nos resultados, unit-linked, e ativos livres.
-- **R-15** Cada transferência entre carteiras regista: instrumento e lote, quantidade ou nominal, carteira de origem e destino, data efetiva, valor de transferência (justo valor na data, ou outro definido pela regra), motivo, quem registou, quando, quem aprovou e quando. Lista completa no documento de requisitos e na secção 8.
-- **R-16** As transferências que envolvam patrimónios autónomos ou produtos com participação nos resultados ficam sempre sujeitas a aprovação e geram um aviso de impacto (a transferência pode mexer na participação nos resultados dos tomadores).
-- **R-17** Mapa de cobertura das provisões técnicas: provisões técnicas por carteira afeta (importadas da contabilidade ou introduzidas) contra o valor dos ativos afetos, com excesso ou insuficiência.
+- **R-14** Os tipos de carteira são os da tabela 9 do PCES (8.1). Cada carteira indica a classe de contas (20, 21, 22 ou 23) e, se for o caso, o fundo autónomo.
+- **R-15** Cada transferência entre carteiras regista: instrumento e lote, quantidade ou nominal, carteira de origem e destino, data efetiva, valor de transferência (**o valor contabilizado** na data, NR 9/2022-R ponto 5), motivo, quem registou, quando, quem aprovou e quando. Lista completa no documento de requisitos e na secção 8.
+- **R-16** As transferências que envolvam fundos autónomos ou produtos com participação nos resultados ficam sempre sujeitas a aprovação e geram um aviso de impacto (a transferência pode mexer na participação nos resultados dos tomadores).
+- **R-17** Mapa de cobertura: passivos de contratos de seguros (IFRS 17) e provisões técnicas (Solvência II) por carteira afeta (importadas da contabilidade ou introduzidas) contra o valor dos ativos afetos, com excesso ou insuficiência.
 
 ## 5. Perfis e permissões
 
@@ -188,16 +194,16 @@ Uma linha por fluxo previsto: data, tipo (cupão, amortização, reembolso final
 Entidade, código, nome, carteira-mãe (hierarquia), tipo de afetação (secção 8), ramo, produto, fundo, natureza das responsabilidades, modelo de negócio IFRS 9, moeda de reporte, carteira Solvência II (campo "Portfolio" do S.06.02), fundo autónomo (sim/não e identificador), estado. Os tipos e as dimensões são listas do backoffice.
 
 ### 6.6 Transação
-Tipo, instrumento, carteira, lote (quando aplicável), data de negociação, data de liquidação, data contabilística, quantidade ou nominal, preço (limpo), juro corrido, custos de transação, impostos retidos, valor total, moeda, câmbio, contraparte, corretor, custodiante, referência externa, motivo, estado (rascunho, submetida, aprovada, rejeitada, estornada), transação que estorna.
+Tipo, instrumento, carteira, lote (quando aplicável), data de negociação, data de liquidação, data contabilística, quantidade ou nominal, preço (limpo), juros corridos, custos de transação, impostos retidos, valor total, moeda, câmbio, contraparte, corretor, custodiante, referência externa, motivo, estado (rascunho, submetida, aprovada, rejeitada, estornada), transação que estorna.
 
 ### 6.7 Lote
-Transação de origem, instrumento, carteira, data de aquisição, quantidade ou nominal inicial e em vida, custo de aquisição (incluindo custos de transação, na moeda do título e na funcional), câmbio de aquisição, TJE, classificação IFRS 9, designações (JVORI ações, JVR), rating e PD na aquisição, estágio ECL atual, afetação atual.
+Transação de origem, instrumento, carteira, data de aquisição, quantidade ou nominal inicial e em vida, custo de aquisição (incluindo custos de transação, na moeda do título e na funcional), câmbio de aquisição, TJE, classificação IFRS 9, designações (FVOCI para ações, FVTPL), rating e PD na aquisição, estágio ECL atual, afetação atual.
 
 ### 6.8 Posição (vista calculada)
-Por carteira, instrumento e data: quantidade, nominal, custo de aquisição, custo amortizado, juro corrido, imparidade acumulada, justo valor, reserva de justo valor, mais/menos-valia potencial, valor Solvência II. É uma vista e não uma tabela editável (P3).
+Por carteira, instrumento e data: quantidade, nominal, custo de aquisição, custo amortizado, juros corridos, imparidade acumulada, justo valor, reserva de justo valor, mais/menos-valia potencial, valor Solvência II. É uma vista e não uma tabela editável (P3).
 
 ### 6.9 Movimento de afetação
-Lote, quantidade, carteira de origem, carteira de destino, data efetiva, valor de transferência, motivo, registo e aprovação. A afetação atual de um lote é sempre o resultado do histórico de movimentos (R-15).
+Lote, quantidade, carteira de origem, carteira de destino, data efetiva, valor de transferência (valor contabilizado), reserva de justo valor acumulada na origem até à data, motivo, registo e aprovação. A afetação atual de um lote é sempre o resultado do histórico de movimentos (R-15).
 
 ### 6.10 Valorização
 Instrumento, data, preço, tipo de preço (limpo, sujo, percentagem do nominal, por ação, NAV), fonte, nível IFRS 13, manual (sim/não), aprovação, comentário, anexo.
@@ -229,13 +235,19 @@ Tabela única, só de escrita: tabela, registo, campo, valor anterior, valor nov
 
 ## 8. Carteiras, afetação e reafetação
 
-### 8.1 Tipos de carteira (lista parametrizável, com estes valores iniciais)
-- Ativos afetos - Vida (com e sem participação nos resultados)
-- Ativos afetos - Não Vida
-- Ativos afetos - patrimónios / fundos autónomos
-- Ativos afetos - unit-linked
-- Ativos não afetos (livres)
-- Outras carteiras ou subcarteiras configuráveis
+### 8.1 Tipos de carteira (tabela 9 do PCES; a lista é parametrizável, mas parte destes valores)
+| Carteira (tabela 9) | Classe de contas |
+| --- | --- |
+| a) Seguro de vida com participação nos resultados e sem investimento autónomo | 20 |
+| b) Seguro de vida com participação nos resultados e com investimento autónomo - por fundo autónomo | 20 |
+| c) Componente de depósito de contratos de seguro e contratos considerados contratos de investimento - por fundo autónomo | 21 |
+| d) Outros seguros de vida, sem investimento autónomo | 20 |
+| e) Outros seguros de vida, com investimento autónomo - por fundo autónomo | 20 |
+| f) Seguro de acidentes de trabalho | 22 |
+| g) Restantes seguros não vida | 22 |
+| h) Valores livres | 23 |
+
+Subcarteiras configuráveis ficam sempre dentro de um destes tipos, para os lançamentos e os mapas do PCES saírem certos.
 
 ### 8.2 Dimensões
 Ramo, produto, fundo, natureza das responsabilidades, grupo de contratos IFRS 17, ou outra dimensão definida pela seguradora.
@@ -244,8 +256,11 @@ Ramo, produto, fundo, natureza das responsabilidades, grupo de contratos IFRS 17
 - Afetação inicial (na aquisição, a carteira de destino é a afetação).
 - Afetação total ou parcial de um lote. Parcial divide o lote em dois, ambos com o mesmo custo unitário, TJE e data de aquisição (R-23).
 - Reafetação entre carteiras.
-- Libertação (passa para livres).
-- **R-23** Uma reafetação **não é uma venda**: mantém custo, TJE, classificação e estágio do lote, salvo se a carteira de destino tiver outro modelo de negócio. Nesse caso a aplicação avisa e exige a operação de reclassificação (R-03), com aprovação dupla.
+- Libertação (passa para valores livres).
+- **R-23** Uma reafetação **não é uma venda** e não dá, por si só, lugar a reclassificação (NR 9/2022-R, ponto 5, n.º 4): mantém custo, TJE, classificação e estágio do lote. Se a carteira de destino tiver outro modelo de negócio, a aplicação avisa; a reclassificação só acontece nos casos da IFRS 9 (R-03), como operação separada com aprovação dupla.
+- **R-53** A transferência faz-se pelo **valor contabilizado** do lote na data efetiva (quantia escriturada, juros corridos incluídos), sem gerar ganho ou perda.
+- **R-54** A transferência **gera lançamento** sempre que as carteiras de origem e destino estão em classes de contas diferentes (20, 21, 22, 23) ou em subcontas diferentes da reserva de justo valor (11 010 / 11 011, afetos a vida com participação nos resultados ou outros): sai da conta de origem e entra na de destino pelo mesmo valor.
+- **R-55** A reserva de justo valor é acompanhada **por lote e por carteira**: os ajustamentos até à data da transferência ficam na carteira de origem e os posteriores na de destino (NR 9/2022-R, ponto 5, n.os 5 e 6). Na venda de dívida FVOCI que passou por carteiras com participação nos resultados, o ganho ou perda reclassificado para resultados reparte-se pelas carteiras segundo esses ajustamentos (n.º 7). Cenário C-11.
 - **R-24** Antes de aprovar, a aplicação mostra o impacto da reafetação: valor que sai e entra em cada carteira, cobertura das provisões técnicas antes e depois (R-17) e limites afetados (pré-verificação, secção 13).
 - **R-25** Nada se substitui nem se apaga. Para corrigir uma reafetação faz-se uma reafetação inversa, ligada à primeira.
 
@@ -258,12 +273,12 @@ Posições afetas e não afetas em separado e consolidadas, por instrumento, car
 Aquisição; venda total ou parcial; pagamento de cupão; amortização de capital; vencimento; resgate antecipado (call/put); transferência ou reafetação; dividendo; aumento de capital, cisão, fusão, desdobramento (eventos societários); registo de imparidade; ajustamento de justo valor; reclassificação IFRS 9; movimentos manuais identificados e aprovados.
 
 ### 9.2 Campos
-Ver 6.6. Obrigatórios: data de negociação, data de liquidação, quantidade ou nominal, preço, valor total, juro corrido (em dívida), custos de transação, moeda e câmbio, contraparte, carteira e afetação.
+Ver 6.6. Obrigatórios: data de negociação, data de liquidação, quantidade ou nominal, preço, valor total, juros corridos (em dívida), custos de transação, moeda e câmbio, contraparte, carteira e afetação.
 
 ### 9.3 Regras
-- **R-26** O juro corrido na compra e na venda é calculado pela aplicação segundo a convenção do instrumento e comparado com o da nota de corretagem. Uma diferença acima da tolerância (parametrizável, por omissão 0,01 na moeda) bloqueia a submissão até ser justificada.
+- **R-26** Os juros corridos na compra e na venda são calculados pela aplicação segundo a convenção do instrumento e comparados com os da nota de corretagem. Uma diferença acima da tolerância (parametrizável, por omissão 0,01 na moeda) bloqueia a submissão até ser justificada.
 - **R-27** Vendas consomem lotes pelo método parametrizado por entidade: **custo médio ponderado** (por omissão, prática comum em Portugal), FIFO ou identificação específica do lote. O método escolhido é o mesmo para todos os títulos da entidade, por coerência da política contabilística.
-- **R-28** Cupões e amortizações são **propostos automaticamente** a partir do calendário de fluxos, com o valor esperado. O utilizador confirma com o valor recebido (do extrato do custodiante). Diferenças ficam assinaladas.
+- **R-28** Cupões e amortizações são **propostos automaticamente** a partir do calendário de fluxos, com o valor esperado. O utilizador confirma com o valor recebido (do extrato do depositário). Diferenças ficam assinaladas.
 - **R-29** Estados: rascunho → submetida → aprovada (gera lançamentos) → estornada (opcional). Uma operação aprovada não se edita: estorna-se e regista-se de novo.
 - **R-30** Operações com data contabilística num período fechado não são aceites. Exigem reabertura do período, com aprovação.
 
@@ -271,29 +286,29 @@ Ver 6.6. Obrigatórios: data de negociação, data de liquidação, quantidade o
 
 Todos os cálculos são determinísticos, reproduzíveis numa data passada (P9) e mostram o detalhe (P8).
 
-### 10.1 Contagem de dias e juro corrido
+### 10.1 Contagem de dias e juros corridos
 Convenções suportadas: ACT/ACT (ICMA), ACT/360, ACT/365 Fixed, 30/360 (Bond Basis), 30E/360.
 
-`Juro corrido = Nominal × Taxa do cupão × Fração de ano(última data de cupão, data de liquidação)`
+`Juros corridos = Nominal × Taxa do cupão × Fração de ano(última data de cupão, data de liquidação)`
 
 Na ACT/ACT ICMA: `Fração = dias decorridos / (dias do período de cupão × frequência)`.
 
 ### 10.2 Taxa de juro efetiva e custo amortizado
-- **R-31** Na aquisição calcula-se a TJE: a taxa `r` que verifica `Custo de aquisição (preço limpo × nominal + juro corrido pago + custos de transação) = Σ Fluxo_i / (1 + r)^(t_i)`, com `t_i` em anos medidos em períodos de cupão (número de períodos, com a fração do período em curso pela ACT/ACT ICMA, a dividir pela frequência), para que um ano bissexto não altere a taxa de uma obrigação com cupões regulares, e os fluxos contratuais (cupões, amortizações, reembolso). Resolve-se numericamente (Newton-Raphson com bissecção de recurso).
+- **R-31** Na aquisição calcula-se a TJE: a taxa `r` que verifica `Custo de aquisição (preço limpo × nominal + juros corridos pagos + custos de transação) = Σ Fluxo_i / (1 + r)^(t_i)`, com `t_i` em anos medidos em períodos de cupão (número de períodos, com a fração do período em curso pela ACT/ACT ICMA, a dividir pela frequência), para que um ano bissexto não altere a taxa de uma obrigação com cupões regulares, e os fluxos contratuais (cupões, amortizações, reembolso). Resolve-se numericamente (Newton-Raphson com bissecção de recurso).
 - **R-32** Juro do período pela TJE = `Custo amortizado bruto no início × ((1 + r)^(Δt) − 1)`. A diferença entre o juro TJE e o cupão vencido no período é a amortização do prémio ou desconto.
 - **R-33** Custo amortizado bruto = valor inicial + juro TJE acumulado − fluxos recebidos. Custo amortizado líquido = bruto − ECL (só em CA).
 - **R-34** Taxa variável: a TJE é recalculada a cada fixação do indexante, mantendo o prémio/desconto inicial (IFRS 9 B5.4.5).
 - **R-35** Alteração de estimativa dos fluxos (ex.: amortização antecipada parcial): ajuste de catch-up ao custo amortizado, descontando os novos fluxos à TJE original, com o ajuste em resultados (IFRS 9 B5.4.6).
-- **R-36** O juro corrido na compra faz parte do custo do lote e é "devolvido" no primeiro cupão. A aplicação mostra-o separado para controlo, mas o cálculo da TJE já o inclui.
+- **R-36** Os juros corridos pagos na compra fazem parte do custo do lote e são "devolvidos" no primeiro cupão. A aplicação mostra-os à parte para controlo, mas o cálculo da TJE já os inclui.
 
 ### 10.3 Justo valor e reserva
-- JVORI dívida: `Reserva de justo valor = Justo valor (limpo) − Custo amortizado bruto (limpo)`, com o ECL do lote registado na reserva e não no valor do ativo.
-- JVORI ações: `Reserva = Justo valor − Custo de aquisição`. Na venda transfere para resultados transitados.
-- JVR: variação de justo valor do período em resultados.
-- **R-37** Para dívida em moeda estrangeira separa-se a variação cambial (IAS 21): em JVORI dívida, a diferença cambial sobre o custo amortizado vai a resultados e o resto a reserva. Em JVORI ações, tudo a reserva.
+- FVOCI dívida: `Reserva de justo valor = Justo valor (limpo) − Custo amortizado bruto (limpo)`, com o ECL do lote registado na reserva e não no valor do ativo.
+- FVOCI ações: `Reserva = Justo valor − Custo de aquisição`. Na venda transfere para resultados transitados.
+- FVTPL: variação de justo valor do período em resultados.
+- **R-37** Para dívida em moeda estrangeira separa-se a variação cambial (IAS 21): em FVOCI dívida, a diferença cambial sobre o custo amortizado vai a resultados e o resto a reserva. Em FVOCI ações, tudo a reserva.
 
 ### 10.4 Mais e menos-valias realizadas
-`Mais-valia = Valor de venda (limpo, líquido de custos) − Custo amortizado (ou custo, em ações) dos lotes consumidos`. Em JVORI dívida, recicla-se a reserva do lote para resultados. Valores na moeda do título e na funcional.
+`Mais-valia = Valor de venda (limpo, líquido de custos) − Custo amortizado (ou custo, em ações) dos lotes consumidos`. Em FVOCI dívida, a reserva do lote passa para resultados (ajustamento de reclassificação), repartida por carteira segundo R-55. Valores na moeda do título e na funcional.
 
 ### 10.5 Imparidade
 R-06 a R-09. Cálculo mensal, por lote, com movimento do período (dotação, reversão, utilização na venda ou abate).
@@ -319,10 +334,10 @@ Por lote e período: juro TJE, dividendos, mais/menos-valias realizadas, variaç
 A aplicação é o **subrazão de investimentos**. Gera os lançamentos de cada evento, por regra parametrizada, e exporta-os para o ERP. O razão geral continua no ERP.
 
 ### 12.2 Eventos contabilísticos
-Aquisição; juro TJE do período (acréscimo); cupão recebido; amortização e reembolso; venda (custo, mais/menos-valia, reciclagem da reserva); variação de justo valor (resultados ou reserva); diferença cambial; ECL (dotação e reversão); dividendo atribuído e recebido; imposto retido; reafetação (quando o plano de contas distingue contas por afetação); reclassificação.
+Aquisição; juro TJE do período (acréscimo); cupão recebido; amortização e reembolso; venda (custo, mais/menos-valia, reciclagem da reserva); variação de justo valor (resultados ou reserva); diferença cambial; ECL (dotação e reversão); dividendo atribuído e recebido; imposto retido; transferência entre carteiras (R-54); reclassificação.
 
 ### 12.3 Regras
-- **R-42** Matriz de regras: evento × classificação IFRS 9 × tipo de carteira × tipo de ativo → contas a débito e crédito (6.13). Ex.: "Juro TJE, CA, afetos Vida, obrigações" → débito "Juros a receber / Investimentos ao custo amortizado"; crédito "Rendimentos de investimentos". As contas concretas do PCES carregam-se como dados **[a confirmar plano de contas em vigor]**.
+- **R-42** Matriz de regras: evento × classificação IFRS 9 × tipo de carteira × tipo de ativo → contas a débito e crédito (6.13). Ex.: "Juro TJE, CA, afetos Vida, títulos de dívida" → débito 20 252 (Ativos financeiros mensurados ao custo amortizado - títulos de dívida, afetos Vida) e crédito 74 0 (Rendimentos de investimentos - afetos Vida). O plano de contas é o da NR 9/2022-R e carrega-se como dados (P2); as subcontas finais de cada seguradora são confirmadas na implementação.
 - **R-43** Cada lançamento guarda a regra, a transação e o lote de origem (drill-down do ERP até ao título).
 - **R-44** Validação antes de exportar: débitos iguais a créditos por entidade, período e moeda; todas as contas existem no plano ativo; nenhum evento sem regra.
 - **R-45** Exportação por ficheiro (CSV/Excel no formato do ERP, configurável por coluna) e, na fase 2, por API. Cada exportação tem número, totais e estado, e não pode ser exportada duas vezes sem estorno.
@@ -332,7 +347,7 @@ Lista de verificação guiada (padrão de tarefas do ON):
 1. Câmbios do período carregados.
 2. Preços carregados e exceções tratadas (R-39).
 3. Fluxos do período confirmados (cupões, amortizações, dividendos) (R-28).
-4. Reconciliação com o custodiante sem diferenças por justificar (secção 14).
+4. Reconciliação com o depositário sem diferenças por justificar (secção 14).
 5. Ratings atualizados e ECL calculado e aprovado.
 6. Limites verificados e excessos justificados.
 7. Cálculo do período (custo amortizado, justo valor, reservas, mais-valias).
@@ -346,9 +361,9 @@ Lista de verificação guiada (padrão de tarefas do ON):
 - **R-48** Excessos: estado (aberto, justificado, regularizado), responsável, prazo, comentário e histórico.
 - **R-49** Agregação por grupo de emitentes usa o grupo do emitente (6.2), para cumprir a lógica de concentração do gestor prudente.
 
-## 14. Reconciliação com o custodiante
+## 14. Reconciliação com o depositário
 
-- Importação do extrato de posições e de movimentos de caixa do custodiante (CSV/Excel, formatos parametrizados por banco).
+- Importação do extrato de posições e de movimentos de caixa do depositário (CSV/Excel, formatos parametrizados por banco).
 - **R-50** Comparação por ISIN e conta de custódia: quantidade ou nominal, e movimentos de caixa (cupões, amortizações, dividendos, liquidações). Diferenças classificadas (em trânsito, por registar, erro) e justificadas antes do fecho.
 
 ## 15. Reporting
@@ -381,7 +396,7 @@ Lista de verificação guiada (padrão de tarefas do ON):
 | Operações | Notas de corretagem / confirmações |
 | Preços | Fecho diário ou mensal |
 | Câmbios | Se não vierem do BCE |
-| Extrato do custodiante | Reconciliação (secção 14) |
+| Extrato do depositário | Reconciliação (secção 14) |
 | Ratings | Atualização periódica |
 | Provisões técnicas | Cobertura (R-17) |
 | Saldo inicial (migração) | Lotes em vida com custo, TJE e afetação à data de início |
@@ -396,7 +411,7 @@ Corresponde a `1 - Código VSC/web-pages/` e ao mockup.
 
 | Página | Conteúdo |
 | --- | --- |
-| Inicio | Hero com valor da carteira (contabilístico, justo valor, Solvência II), afetos vs livres, cobertura das provisões técnicas e alertas. Tarefas do fecho, aprovações pendentes e calendário de fluxos |
+| Inicio | Hero com valor da carteira (contabilístico, justo valor, Solvência II), afetos vs valores livres, cobertura dos passivos de contratos de seguros e alertas. Tarefas do fecho, aprovações pendentes e calendário de fluxos |
 | Instrumentos | Cadastro com pesquisa e filtros. Abre a ficha |
 | Instrumento | Ficha com separadores (secção 7) e cálculo explicado |
 | Carteiras | Árvore de carteiras por entidade e tipo de afetação, com totais e cobertura |
@@ -415,7 +430,7 @@ Corresponde a `1 - Código VSC/web-pages/` e ao mockup.
 ## 19. API e integrações (fase 2)
 
 - API REST com os mesmos objetos e validações da importação.
-- Integrações previstas: dados de mercado (preços, ratings, dados de referência), BCE (câmbios), custodiante (SWIFT MT535/MT950 ou ficheiro), ERP (lançamentos), ferramenta de reporte Solvência II (S.06.02).
+- Integrações previstas: dados de mercado (preços, ratings, dados de referência), BCE (câmbios), depositário (SWIFT MT535/MT950 ou ficheiro), ERP (lançamentos), ferramenta de reporte Solvência II (S.06.02).
 
 ## 20. Requisitos não funcionais
 
@@ -440,8 +455,8 @@ Herda o ON: mesmo `global.css` (tokens de cor, Instrument Sans e JetBrains Mono,
 
 | Fase | Âmbito |
 | --- | --- |
-| MVP | Cadastro, carteiras e afetação, operações (compra, venda, cupão, amortização, vencimento, reafetação), custo amortizado e juro corrido, justo valor e reserva, preços manuais e por ficheiro, lançamentos por regra e exportação, fecho do período, aprovações e trilho, inventário e mapa de cobertura |
-| Fase 2 | ECL completo, limites, reconciliação com o custodiante, S.06.02 e S.09.01, eventos societários, multi-moeda completo, API |
+| MVP | Cadastro, carteiras e afetação, operações (compra, venda, cupão, amortização, vencimento, reafetação), custo amortizado e juros corridos, justo valor e reserva, preços manuais e por ficheiro, lançamentos por regra e exportação, fecho do período, aprovações e trilho, inventário e mapa de cobertura |
+| Fase 2 | ECL completo, limites, reconciliação com o depositário, S.06.02 e S.09.01, eventos societários, multi-moeda completo, API |
 | Fase 3 | Look-through de fundos (TPT e S.06.03), fontes de dados de mercado, multi-entidade com consolidação, ligação a ferramentas de IFRS 17 |
 
 Fora de âmbito: negociação e ordens, otimização de carteiras, derivados complexos (só registo simples de forwards cambiais, se necessário), cálculo de passivos IFRS 17, cálculo do SCR, produção do XBRL.
@@ -450,15 +465,17 @@ Decisões em aberto: ver `plano-gestao-investimentos.md`.
 
 ## 24. Critérios de aceitação (cenários de teste)
 
-**C-01 Custo amortizado com desconto.** Compra a 2026-01-01 de 1 000 000 de nominal de uma obrigação a taxa fixa de 3%, cupão anual a 1 de janeiro, vencimento 2029-01-01, preço 97,224909%, sem juro corrido nem custos. Custo 972 249,09. Fluxos: 30 000 em 2027 e 2028 e 1 030 000 em 2029. TJE = 4,0000%. Juro TJE do 1.º ano = 38 889,96; cupão 30 000,00; amortização do desconto 8 889,96; custo amortizado a 2027-01-01 = 981 139,05; a 2028-01-01 = 990 384,62. No vencimento, depois do reembolso, o custo amortizado é exatamente 0 (diferença de arredondamento acertada no último período).
+**C-01 Custo amortizado com desconto.** Compra a 2026-01-01 de 1 000 000 de nominal de uma obrigação a taxa fixa de 3%, cupão anual a 1 de janeiro, vencimento 2029-01-01, preço 97,224909%, sem juros corridos nem custos. Custo 972 249,09. Fluxos: 30 000 em 2027 e 2028 e 1 030 000 em 2029. TJE = 4,0000%. Juro TJE do 1.º ano = 38 889,96; cupão 30 000,00; amortização do desconto 8 889,96; custo amortizado a 2027-01-01 = 981 139,05; a 2028-01-01 = 990 384,62. No vencimento, depois do reembolso, o custo amortizado é exatamente 0 (diferença de arredondamento acertada no último período).
 
-**C-02 Juro corrido na compra.** Mesma obrigação comprada a 2026-07-02 (ACT/ACT ICMA): juro corrido = 1 000 000 × 3% × 182/365 = 14 958,90. A diferença face à nota de corretagem acima de 0,01 bloqueia a submissão (R-26).
+**C-02 Juros corridos na compra.** Mesma obrigação comprada a 2026-07-02 (ACT/ACT ICMA): juros corridos = 1 000 000 × 3% × 182/365 = 14 958,90. A diferença face à nota de corretagem acima de 0,01 bloqueia a submissão (R-26).
 
 **C-03 Venda parcial com custo médio.** Dois lotes de 500 000 do mesmo título com custos amortizados de 490 000 e 505 000. Venda de 400 000 a 99%: custo médio 99,5%; custo consumido 398 000; mais/menos-valia = 396 000 − 398 000 = −2 000. Sobram 600 000 de nominal ao custo de 597 000.
 
-**C-04 Reafetação parcial.** Lote de 1 000 000 em "Livres", reafetação de 300 000 para "Afetos Vida" a 2026-06-30. Resultado: dois lotes (700 000 e 300 000) com a mesma TJE e data de aquisição, histórico com origem, destino, utilizador e aprovador, e nenhuma linha anterior alterada.
+**C-04 Reafetação parcial.** Lote de 1 000 000 em "Valores livres", reafetação de 300 000 para "Vida com participação nos resultados" a 2026-06-30. Resultado: dois lotes (700 000 e 300 000) com a mesma TJE e data de aquisição, histórico com origem, destino, utilizador e aprovador, e nenhuma linha anterior alterada.
 
-**C-05 JVORI dívida.** O lote de C-01 classificado em JVORI, a 2027-01-01: custo amortizado bruto 981 139,05; justo valor 990 000,00; ECL 1 200,00. Reserva de justo valor = 8 860,95 + 1 200,00 (o ECL vai a resultados por contrapartida de ORI) = 10 060,95; valor de balanço = 990 000,00.
+**C-05 FVOCI dívida.** O lote de C-01 classificado em FVOCI, a 2027-01-01: custo amortizado bruto 981 139,05; justo valor 990 000,00; ECL 1 200,00. Reserva de justo valor = 8 860,95 + 1 200,00 (o ECL vai a resultados por contrapartida de ORI) = 10 060,95; valor de balanço = 990 000,00.
+
+**C-11 Repartição da reserva entre carteiras (R-55).** Um lote FVOCI de dívida está na carteira Vida com participação nos resultados A, onde acumula uma reserva de justo valor de +30 000,00. É transferido pelo valor contabilizado para a carteira B (também com participação nos resultados); depois da transferência a reserva varia −5 000,00. Na venda, o ajustamento de reclassificação para resultados é de +25 000,00, repartido por A +30 000,00 e B −5 000,00. A transferência não gerou ganho nem perda.
 
 **C-06 Preço manual.** Um preço manual sem aprovação não entra no cálculo. Ao aprovar, a aplicação guarda quem e quando, e o preço anterior fica no histórico.
 
@@ -490,4 +507,4 @@ Os dois primeiros carateres são o código ISO do país de cotação, `XL` se n�
 
 ## Anexo B. Dados de demonstração
 
-O mockup usa uma seguradora fictícia, **Seguradora A**, com carteiras Vida (afetos), Não Vida (afetos), Fundo autónomo PPR (afetos) e Livres, cerca de 20 instrumentos (dívida pública portuguesa, espanhola, italiana e alemã, dívida de empresas europeias, duas ações cotadas, uma participação não cotada e um fundo). Os emitentes de dívida pública são identificados pelo Estado. As empresas são fictícias ("Emitente Industrial A", "Banco B") seguindo a regra do ON de não usar nomes de empresas.
+O mockup usa uma seguradora fictícia, **Seguradora A**, com as carteiras Vida com participação nos resultados (afetos), Não Vida (afetos), Fundo autónomo PPR (afetos) e Valores livres, cerca de 20 instrumentos (dívida pública portuguesa, espanhola, italiana e alemã, dívida de empresas europeias, duas ações cotadas, uma participação não cotada e um fundo). Os emitentes de dívida pública são identificados pelo Estado. As empresas são fictícias ("Emitente Industrial A", "Banco B") seguindo a regra do ON de não usar nomes de empresas.

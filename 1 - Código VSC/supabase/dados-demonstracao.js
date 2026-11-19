@@ -6,11 +6,12 @@ window.INV = {
   periodo: 'Outubro 2026',
   entidade: { id: 'SA', nome: 'Seguradora A', moeda: 'EUR', metodoLotes: 'Custo médio ponderado' },
 
+  /* Tipos de carteira e classes de contas da tabela 9 e do quadro de contas do PCES (NR 9/2022-R) */
   carteiras: [
-    { id: 'VIDA', nome: 'Vida com participação nos resultados', tipo: 'Afetos - Vida', afeto: true, ramo: 'Vida', modelo: 'Deter para receber e vender', sii: 'Life', pt: 28600000 },
-    { id: 'NVIDA', nome: 'Não Vida', tipo: 'Afetos - Não Vida', afeto: true, ramo: 'Não Vida', modelo: 'Deter para receber', sii: 'Non-life', pt: 10500000 },
-    { id: 'PPR', nome: 'Fundo autónomo PPR', tipo: 'Afetos - fundo autónomo', afeto: true, ramo: 'Vida', modelo: 'Deter para receber e vender', sii: 'Ring fenced funds', pt: 9750000, rff: 'RFF-01' },
-    { id: 'LIVRES', nome: 'Ativos livres', tipo: 'Não afetos (livres)', afeto: false, ramo: '-', modelo: 'Deter para receber e vender', sii: 'General', pt: 0 }
+    { id: 'VIDA', nome: 'Vida com participação nos resultados', tipo: 'a) Vida com participação nos resultados, sem investimento autónomo', classe: '20', afeto: true, ramo: 'Vida', modelo: 'Deter para recolher e vender (Hold to collect and sell)', sii: 'Life', pt: 28600000 },
+    { id: 'NVIDA', nome: 'Não Vida', tipo: 'g) Restantes seguros não vida', classe: '22', afeto: true, ramo: 'Não Vida', modelo: 'Deter para recolher (Hold to collect)', sii: 'Non-life', pt: 10500000 },
+    { id: 'PPR', nome: 'Fundo autónomo PPR', tipo: 'b) Vida com participação nos resultados, com investimento autónomo', classe: '20', afeto: true, ramo: 'Vida', modelo: 'Deter para recolher e vender (Hold to collect and sell)', sii: 'Ring fenced funds', pt: 9750000, rff: 'RFF-01' },
+    { id: 'LIVRES', nome: 'Valores livres', tipo: 'h) Valores livres', classe: '23', afeto: false, ramo: '-', modelo: 'Deter para recolher e vender (Hold to collect and sell)', sii: 'General', pt: 0 }
   ],
 
   emitentes: {
@@ -47,26 +48,26 @@ window.INV = {
   ],
 
   /* Lotes: q = nominal (obrigacoes e depositos) ou quantidade (acoes, participacoes, fundos); p = preco limpo de aquisicao (% ou por unidade);
-     cl = classificacao IFRS 9 (CA, JVORI, JVORI-AC = JVORI capital proprio, JVR); pd/rt = rating na aquisicao */
+     cl = classificacao IFRS 9 (CA, FVOCI, FVOCI-EQ = FVOCI capital proprio, FVTPL); pd/rt = rating na aquisicao */
   lotes: [
-    { id: 'L001', i: 'I01', c: 'VIDA', d: '2024-09-12', q: 6000000, p: 99.10, cl: 'JVORI', rt: 'BBB+' },
-    { id: 'L002', i: 'I01', c: 'PPR', d: '2025-03-04', q: 3000000, p: 98.20, cl: 'JVORI', rt: 'A-' },
+    { id: 'L001', i: 'I01', c: 'VIDA', d: '2024-09-12', q: 6000000, p: 99.10, cl: 'FVOCI', rt: 'BBB+' },
+    { id: 'L002', i: 'I01', c: 'PPR', d: '2025-03-04', q: 3000000, p: 98.20, cl: 'FVOCI', rt: 'A-' },
     { id: 'L003', i: 'I02', c: 'NVIDA', d: '2022-02-10', q: 3000000, q0: 4000000, p: 103.85, cl: 'CA', rt: 'BBB' },
-    { id: 'L004', i: 'I03', c: 'VIDA', d: '2023-06-20', q: 5000000, p: 99.40, cl: 'JVORI', rt: 'A' },
-    { id: 'L005', i: 'I04', c: 'VIDA', d: '2024-01-15', q: 5000000, p: 101.95, cl: 'JVORI', rt: 'BBB' },
-    { id: 'L006', i: 'I04', c: 'PPR', d: '2024-05-08', q: 2500000, p: 100.60, cl: 'JVORI', rt: 'BBB' },
-    { id: 'L007', i: 'I05', c: 'VIDA', d: '2025-03-20', q: 7000000, p: 97.35, cl: 'JVORI', rt: 'AAA' },
+    { id: 'L004', i: 'I03', c: 'VIDA', d: '2023-06-20', q: 5000000, p: 99.40, cl: 'FVOCI', rt: 'A' },
+    { id: 'L005', i: 'I04', c: 'VIDA', d: '2024-01-15', q: 5000000, p: 101.95, cl: 'FVOCI', rt: 'BBB' },
+    { id: 'L006', i: 'I04', c: 'PPR', d: '2024-05-08', q: 2500000, p: 100.60, cl: 'FVOCI', rt: 'BBB' },
+    { id: 'L007', i: 'I05', c: 'VIDA', d: '2025-03-20', q: 7000000, p: 97.35, cl: 'FVOCI', rt: 'AAA' },
     { id: 'L008', i: 'I06', c: 'NVIDA', d: '2023-03-10', q: 3000000, p: 91.20, cl: 'CA', rt: 'AAA' },
-    { id: 'L009', i: 'I07', c: 'VIDA', d: '2024-02-01', q: 4000000, p: 100.25, cl: 'JVORI', rt: 'BBB+' },
+    { id: 'L009', i: 'I07', c: 'VIDA', d: '2024-02-01', q: 4000000, p: 100.25, cl: 'FVOCI', rt: 'BBB+' },
     { id: 'L010', i: 'I07', c: 'NVIDA', d: '2024-02-01', q: 2000000, p: 100.25, cl: 'CA', rt: 'BBB+' },
-    { id: 'L011', i: 'I08', c: 'PPR', d: '2023-07-12', q: 4500000, p: 100.80, cl: 'JVORI', rt: 'BBB+' },
-    { id: 'L012', i: 'I08', c: 'LIVRES', d: '2024-10-03', q: 3000000, p: 103.10, cl: 'JVORI', rt: 'A-' },
-    { id: 'L013', i: 'I09', c: 'VIDA', d: '2022-10-05', q: 3500000, p: 86.40, cl: 'JVORI', rt: 'BBB' },
-    { id: 'L014', i: 'I10', c: 'LIVRES', d: '2021-05-17', q: 150000, p: 14.80, cl: 'JVORI-AC' },
-    { id: 'L015', i: 'I11', c: 'LIVRES', d: '2023-09-28', q: 400000, p: 5.62, cl: 'JVR' },
-    { id: 'L016', i: 'I12', c: 'LIVRES', d: '2019-12-30', q: 350000, p: 5.00, cl: 'JVORI-AC' },
-    { id: 'L017', i: 'I13', c: 'NVIDA', d: '2026-01-05', q: 20000, p: 101.950, cl: 'JVR' },
-    { id: 'L018', i: 'I13', c: 'LIVRES', d: '2025-06-02', q: 15000, p: 100.770, cl: 'JVR' },
+    { id: 'L011', i: 'I08', c: 'PPR', d: '2023-07-12', q: 4500000, p: 100.80, cl: 'FVOCI', rt: 'BBB+' },
+    { id: 'L012', i: 'I08', c: 'LIVRES', d: '2024-10-03', q: 3000000, p: 103.10, cl: 'FVOCI', rt: 'A-' },
+    { id: 'L013', i: 'I09', c: 'VIDA', d: '2022-10-05', q: 3500000, p: 86.40, cl: 'FVOCI', rt: 'BBB' },
+    { id: 'L014', i: 'I10', c: 'LIVRES', d: '2021-05-17', q: 150000, p: 14.80, cl: 'FVOCI-EQ' },
+    { id: 'L015', i: 'I11', c: 'LIVRES', d: '2023-09-28', q: 400000, p: 5.62, cl: 'FVTPL' },
+    { id: 'L016', i: 'I12', c: 'LIVRES', d: '2019-12-30', q: 350000, p: 5.00, cl: 'FVOCI-EQ' },
+    { id: 'L017', i: 'I13', c: 'NVIDA', d: '2026-01-05', q: 20000, p: 101.950, cl: 'FVTPL' },
+    { id: 'L018', i: 'I13', c: 'LIVRES', d: '2025-06-02', q: 15000, p: 100.770, cl: 'FVTPL' },
     { id: 'L019', i: 'I14', c: 'NVIDA', d: '2026-03-01', q: 1500000, p: 100, cl: 'CA', rt: 'A-' }
   ],
 
@@ -102,10 +103,10 @@ window.INV = {
   ],
 
   aprovacoes: [
-    { tipo: 'Transaction', ref: 'OP-1189', desc: 'Purchase Bund 2,5% 2035 · Livres · 1 000 000 nominal', por: 'André Borges', em: '2026-11-05 10:20', imp: 'Recorded by you' },
+    { tipo: 'Transaction', ref: 'OP-1189', desc: 'Purchase Bund 2,5% 2035 · Valores livres · 1 000 000 nominal', por: 'André Borges', em: '2026-11-05 10:20', imp: 'Recorded by you' },
     { tipo: 'Transaction', ref: 'OP-1187', desc: 'Coupon BTP 4% 2031 · Vida · 100 000,00 EUR', por: 'Ana Ramos', em: '2026-11-02 09:10', imp: 'Matches cash-flow schedule and custodian statement' },
     { tipo: 'Transaction', ref: 'OP-1188', desc: 'Coupon BTP 4% 2031 · Fundo autónomo PPR · 50 000,00 EUR', por: 'Ana Ramos', em: '2026-11-02 09:11', imp: 'Matches cash-flow schedule and custodian statement' },
-    { tipo: 'Reallocation', ref: 'AF-0032', desc: 'Fundo Monetário I · 15 000 units · Livres → Vida', por: 'Ana Ramos', em: '2026-11-03 09:15', imp: 'Coverage Vida +5,5 p.p. · no limits affected' },
+    { tipo: 'Reallocation', ref: 'AF-0032', desc: 'Fundo Monetário I · 15 000 units · Valores livres → Vida', por: 'Ana Ramos', em: '2026-11-03 09:15', imp: 'Coverage Vida +5,5 p.p. · no limits affected' },
     { tipo: 'Manual price', ref: 'PR-0412', desc: 'Imobiliária H, S.A. · 7,10 EUR/share (was 6,80) · Level 3', por: 'Ana Ramos', em: '2026-11-04 14:22', imp: 'Fair value +105 000,00 EUR in OCI · valuation report attached' },
     { tipo: 'Stage change', ref: 'ECL-0098', desc: 'Energia C 2,25% 2032 · stage 1 → 2 (lost investment grade)', por: 'Rui Matos', em: '2026-11-04 17:40', imp: 'Lifetime ECL replaces 12-month ECL' },
     { tipo: 'Parameter', ref: 'BO-0021', desc: 'Price tolerance, corporate bonds: daily change 3% → 4%', por: 'Rui Matos', em: '2026-11-05 11:05', imp: 'Would release 1 open price exception' }
@@ -115,7 +116,7 @@ window.INV = {
     { em: '2026-11-05 11:05', u: 'Rui Matos', t: 'Parameter', reg: 'BO-0021', campo: 'Tolerance (corporate bonds)', ant: '3%', novo: '4% (pending)', mot: 'Volatilidade do mercado de crédito', orig: 'Backoffice' },
     { em: '2026-11-04 17:40', u: 'Rui Matos', t: 'Impairment', reg: 'ECL-0098', campo: 'Stage', ant: '1', novo: '2 (pending)', mot: 'Rating BB+ (perda de investment grade)', orig: 'Calculation' },
     { em: '2026-11-04 14:22', u: 'Ana Ramos', t: 'Price', reg: 'PR-0412', campo: 'Price', ant: '6,80', novo: '7,10 (pending)', mot: 'Relatório de avaliação 30/09/2026', orig: 'Screen' },
-    { em: '2026-11-03 09:15', u: 'Ana Ramos', t: 'Allocation', reg: 'AF-0032', campo: 'Portfolio', ant: 'Livres', novo: 'Vida (pending)', mot: 'Reforço da cobertura Vida', orig: 'Screen' },
+    { em: '2026-11-03 09:15', u: 'Ana Ramos', t: 'Allocation', reg: 'AF-0032', campo: 'Portfolio', ant: 'Valores livres', novo: 'Vida (pending)', mot: 'Reforço da cobertura Vida', orig: 'Screen' },
     { em: '2026-11-02 08:55', u: 'Sistema', t: 'Import', reg: 'IMP-0377', campo: 'Prices 2026-10-30', ant: '-', novo: '12 prices, 1 exception', mot: 'Ficheiro do custodiante', orig: 'File import' },
     { em: '2026-10-15 16:03', u: 'Pedro Lima', t: 'Allocation', reg: 'AF-0031', campo: 'State', ant: 'Pending approval', novo: 'Approved', mot: '', orig: 'Screen' },
     { em: '2026-10-10 12:41', u: 'Pedro Lima', t: 'Transaction', reg: 'OP-1184', campo: 'State', ant: 'Pending approval', novo: 'Approved', mot: '', orig: 'Screen' },
@@ -134,16 +135,20 @@ window.INV = {
     { t: 'Period closed', s: 'todo', d: 'Needs approval' }
   ],
 
+  /* Regras contabilisticas com as contas do PCES (NR 9/2022-R). "20/22/23" = classe da afetacao do lote (20 Vida, 22 Nao Vida, 23 nao afetos);
+     as subcontas finais confirmam-se com cada seguradora */
   regras: [
-    { ev: 'Purchase', cl: 'Any', cart: 'Any', at: 'Bonds', d: 'Investimentos - custo do título', c: 'Depósitos à ordem' },
-    { ev: 'Interest (EIR)', cl: 'CA / JVORI', cart: 'Any', at: 'Bonds', d: 'Juros a receber / prémio-desconto', c: 'Rendimentos de investimentos - juros' },
-    { ev: 'Coupon received', cl: 'Any', cart: 'Any', at: 'Bonds', d: 'Depósitos à ordem', c: 'Juros a receber' },
-    { ev: 'Fair value change', cl: 'JVORI', cart: 'Any', at: 'Bonds', d: 'Investimentos - ajustamento de justo valor', c: 'Reserva de justo valor' },
-    { ev: 'Fair value change', cl: 'JVR', cart: 'Any', at: 'Any', d: 'Investimentos - ajustamento de justo valor', c: 'Ganhos líquidos de ativos a JVR' },
-    { ev: 'ECL charge', cl: 'JVORI', cart: 'Any', at: 'Bonds', d: 'Perdas de imparidade', c: 'Reserva de justo valor' },
-    { ev: 'ECL charge', cl: 'CA', cart: 'Any', at: 'Bonds', d: 'Perdas de imparidade', c: 'Imparidade acumulada' },
-    { ev: 'Sale - recycling', cl: 'JVORI', cart: 'Any', at: 'Bonds', d: 'Reserva de justo valor', c: 'Ganhos realizados em investimentos' },
-    { ev: 'Sale - OCI transfer', cl: 'JVORI-AC', cart: 'Any', at: 'Equity', d: 'Reserva de justo valor', c: 'Resultados transitados' },
-    { ev: 'Dividend', cl: 'Any', cart: 'Any', at: 'Equity', d: 'Dividendos a receber', c: 'Rendimentos de investimentos - dividendos' }
+    { ev: 'Purchase', cl: 'Any', cart: 'Any', at: 'Debt securities', d: '20/22/23 · Títulos de dívida (conta da classificação)', c: '51 Depósitos à ordem' },
+    { ev: 'Interest (EIR)', cl: 'CA / FVOCI', cart: 'Any', at: 'Debt securities', d: '20/22/23 · Títulos de dívida (juros e amortização do prémio ou desconto)', c: '74 Rendimentos de investimentos' },
+    { ev: 'Coupon received', cl: 'Any', cart: 'Any', at: 'Debt securities', d: '51 Depósitos à ordem', c: '20/22/23 · Títulos de dívida (juros corridos)' },
+    { ev: 'Fair value change', cl: 'FVOCI', cart: 'Any', at: 'Debt securities', d: '20/22/23 · Ativos ao justo valor através de reservas', c: '11 01 Reservas de reavaliação (dívida ao justo valor através de reservas)' },
+    { ev: 'Fair value change', cl: 'FVTPL', cart: 'Any', at: 'Any', d: '20/22/23 · Ativos ao justo valor através de resultados', c: '75 Ganhos em investimentos (65 Perdas, se negativa)' },
+    { ev: 'ECL charge', cl: 'FVOCI', cart: 'Any', at: 'Debt securities', d: '66 Perdas por imparidade', c: '11 2 Provisão para perdas de crédito previstas' },
+    { ev: 'ECL charge', cl: 'CA', cart: 'Any', at: 'Debt securities', d: '66 Perdas por imparidade', c: '29 Imparidade acumulada (custo amortizado)' },
+    { ev: 'ECL reversal', cl: 'CA / FVOCI', cart: 'Any', at: 'Debt securities', d: '29 / 11 2', c: '76 Reversão de perdas por imparidade' },
+    { ev: 'Sale - reclassification adjustment', cl: 'FVOCI', cart: 'Any', at: 'Debt securities', d: '11 01 Reservas de reavaliação', c: '75 Ganhos em investimentos (65 Perdas), repartido por carteira (R-55)' },
+    { ev: 'Sale - transfer within equity', cl: 'FVOCI-EQ', cart: 'Any', at: 'Equity', d: '11 08 Reservas de reavaliação (capital próprio)', c: '19 Resultados transitados' },
+    { ev: 'Dividend', cl: 'Any', cart: 'Any', at: 'Equity', d: '51 Depósitos à ordem', c: '74 Rendimentos de investimentos' },
+    { ev: 'Transfer between portfolios', cl: 'Any', cart: 'Different account class', at: 'Any', d: 'Classe da carteira de destino (20/21/22/23)', c: 'Classe da carteira de origem, pelo valor contabilizado (R-53, R-54)' }
   ]
 };
