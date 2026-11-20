@@ -17,10 +17,10 @@ insert into public.inv_regras_contabilisticas (id, evento, classificacao, cartei
   (6, 'ECL charge', 'FVOCI', 'Any', 'Debt securities', '66 Perdas por imparidade', '11 2 Provisão para perdas de crédito previstas'),
   (7, 'ECL charge', 'CA', 'Any', 'Debt securities', '66 Perdas por imparidade', '29 Imparidade acumulada (custo amortizado)'),
   (8, 'ECL reversal', 'CA / FVOCI', 'Any', 'Debt securities', '29 / 11 2', '76 Reversão de perdas por imparidade'),
-  (9, 'Sale - reclassification adjustment', 'FVOCI', 'Any', 'Debt securities', '11 01 Reservas de reavaliação', '75 Ganhos em investimentos (65 Perdas), repartido por carteira (R-55)'),
+  (9, 'Sale - reclassification adjustment', 'FVOCI', 'Any', 'Debt securities', '11 01 Reservas de reavaliação', '75 Ganhos em investimentos (65 Perdas)'),
   (10, 'Sale - transfer within equity', 'FVOCI-EQ', 'Any', 'Equity', '11 08 Reservas de reavaliação (capital próprio)', '19 Resultados transitados'),
   (11, 'Dividend', 'Any', 'Any', 'Equity', '51 Depósitos à ordem', '74 Rendimentos de investimentos'),
-  (12, 'Transfer between portfolios', 'Any', 'Different account class', 'Any', 'Classe da carteira de destino (20/21/22/23)', 'Classe da carteira de origem, pelo valor contabilizado (R-53, R-54)');
+  (12, 'Transfer between portfolios', 'Any', 'Different account class', 'Any', 'Classe da carteira de destino (20/21/22/23)', 'Classe da carteira de origem, pelo valor contabilizado');
 update public.inv_aprovacoes set descricao = replace(descricao, '· Livres', '· Valores livres') where descricao like '%· Livres%';
 update public.inv_trilho set valor_anterior = 'Valores livres' where valor_anterior = 'Livres';
 select (select string_agg(id || '=' || classe_contas, ' ' order by ordem) from public.inv_carteiras) carteiras,

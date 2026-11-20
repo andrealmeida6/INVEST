@@ -120,7 +120,7 @@
     passos.push(['Amortised cost (clean)', 'Dirty − accrued interest', r.ca]);
     passos.push(['Fair value (clean)', 'Nominal × ' + ins.preco + '% (' + ins.fonte + ', level ' + ins.nivel + ')', r.jv]);
     passos.push(['ECL', 'EAD × PD × LGD = ' + Math.round(r.ead) + ' × ' + (r.pd * 100).toFixed(4) + '% × ' + (r.lgd * 100) + '% · stage ' + r.estagio, r.ecl]);
-    if (l.cl === 'FVOCI') passos.push(['Fair value reserve (account 11)', 'Fair value − amortised cost + ECL (R-37, C-05)', r.reserva]);
+    if (l.cl === 'FVOCI') passos.push(['Fair value reserve (account 11)', 'Fair value − amortised cost + ECL', r.reserva]);
     var fl = fluxos(ins).filter(function (x) { return x.data > ref; }).map(function (x) {
       var v = l.q * (x.cupao + x.capital), t = tempo(ins, ref, x.data);
       return { data: x.data, cupao: l.q * x.cupao, capital: l.q * x.capital, t: t, fd: 1 / Math.pow(1 + r.tje, t), vp: v / Math.pow(1 + r.tje, t) };

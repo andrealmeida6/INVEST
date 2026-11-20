@@ -146,9 +146,9 @@ window.INV = {
     { ev: 'ECL charge', cl: 'FVOCI', cart: 'Any', at: 'Debt securities', d: '66 Perdas por imparidade', c: '11 2 Provisão para perdas de crédito previstas' },
     { ev: 'ECL charge', cl: 'CA', cart: 'Any', at: 'Debt securities', d: '66 Perdas por imparidade', c: '29 Imparidade acumulada (custo amortizado)' },
     { ev: 'ECL reversal', cl: 'CA / FVOCI', cart: 'Any', at: 'Debt securities', d: '29 / 11 2', c: '76 Reversão de perdas por imparidade' },
-    { ev: 'Sale - reclassification adjustment', cl: 'FVOCI', cart: 'Any', at: 'Debt securities', d: '11 01 Reservas de reavaliação', c: '75 Ganhos em investimentos (65 Perdas), repartido por carteira (R-55)' },
+    { ev: 'Sale - reclassification adjustment', cl: 'FVOCI', cart: 'Any', at: 'Debt securities', d: '11 01 Reservas de reavaliação', c: '75 Ganhos em investimentos (65 Perdas)' },
     { ev: 'Sale - transfer within equity', cl: 'FVOCI-EQ', cart: 'Any', at: 'Equity', d: '11 08 Reservas de reavaliação (capital próprio)', c: '19 Resultados transitados' },
     { ev: 'Dividend', cl: 'Any', cart: 'Any', at: 'Equity', d: '51 Depósitos à ordem', c: '74 Rendimentos de investimentos' },
-    { ev: 'Transfer between portfolios', cl: 'Any', cart: 'Different account class', at: 'Any', d: 'Classe da carteira de destino (20/21/22/23)', c: 'Classe da carteira de origem, pelo valor contabilizado (R-53, R-54)' }
+    { ev: 'Transfer between portfolios', cl: 'Any', cart: 'Different account class', at: 'Any', d: 'Classe da carteira de destino (20/21/22/23)', c: 'Classe da carteira de origem, pelo valor contabilizado' }
   ]
 };

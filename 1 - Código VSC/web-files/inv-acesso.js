@@ -27,11 +27,8 @@
     el.setAttribute('role', 'dialog');
     el.setAttribute('aria-modal', 'true');
     el.setAttribute('aria-labelledby', 'ac-tit');
-    el.innerHTML = '<div class="ps-ent"><div class="ps-ent-esq ps-fundo-marca"><div><b class="ps-acesso-marca">Investment Hub</b>' +
-      '<h1>Insurance investment portfolios, controlled and accounted for in one place.</h1>' +
-      '<p>Bonds, listed equity and unlisted participations: allocation to technical provisions, IFRS 9 and Solvency II, every figure explained and every change approved.</p></div>' +
-      '<ul class="ps-ent-pontos"><li><b>One register</b>Instruments, lots, positions and portfolios kept apart</li><li><b>Four eyes</b>Whoever records does not approve</li><li><b>Explained</b>Amortised cost, accrued interest and ECL step by step</li></ul></div>' +
-      '<div class="ps-ent-dir"><h2 id="ac-tit">Sign in</h2><p class="ps-mut">Enter your username or email.</p>' +
+    el.innerHTML = '<div class="ps-ent"><div class="ps-ent-esq ps-fundo-marca"><b class="ps-acesso-marca">Investment Hub</b></div>' +
+      '<div class="ps-ent-dir"><h2 id="ac-tit">Sign in</h2>' +
       '<form class="ps-login" novalidate><div class="ps-campo"><label class="ps-lab" for="ac-user">Username or email</label>' +
       '<input id="ac-user" class="ps-in" type="text" autocomplete="username" autocapitalize="none" spellcheck="false" required></div>' +
       '<div class="ps-aviso err" role="alert" data-acesso-erro hidden></div>' +
@@ -48,10 +45,10 @@
       if (!nome) { aviso('Enter your username or email.'); return; }
       btn.disabled = true; btn.textContent = 'Checking'; aviso('');
       confirmar(nome).then(function (a) {
-        if (!a) { pronto(); aviso('This user has no access. Ask the platform owner to add you.'); input.select(); return; }
+        if (!a) { pronto(); aviso('User not found or without access.'); input.select(); return; }
         gravar(a);
         return abrir(a).then(function () { el.remove(); document.body.classList.remove('ps-acesso-on'); });
-      }).catch(function () { pronto(); aviso('Could not reach the server. Check your connection and try again.'); });
+      }).catch(function () { pronto(); aviso('Could not connect. Try again.'); });
     });
   };
 

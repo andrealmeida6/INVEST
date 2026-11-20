@@ -16,7 +16,7 @@
 
   /* ---------------- Inicio ---------------- */
   B['inicio-estado'] = function () {
-    var ola = document.querySelector('[data-campo="hero-ola"]'); if (ola) ola.textContent = 'Good morning, ' + USER;
+    var ola = document.querySelector('[data-campo="hero-ola"]'); if (ola) ola.textContent = INV.entidade.nome + ' · ' + APP.dt(REF);
     var cores = { VIDA: 'a', NVIDA: 'c', PPR: 'v', LIVRES: 'f' };
     var afeto = soma(L.filter(function (r) { return cart(r.cart).afeto; }), 'sii');
     return '<div class="ps-est-c"><div class="ps-est-t"><div><span class="ps-est-l">Portfolio at ' + APP.dt(REF) + ' · Solvency II value</span><div class="ps-est-v">' + APP.mi(TOT) + '<small>' + APP.pct(afeto / TOT, 0) + ' allocated</small></div></div>' +
@@ -62,7 +62,7 @@
     var fl = proximosFluxos(REF, MOTOR.addMeses(REF, 6));
     return '<section class="ps-card iv-cal ps-fundo-marca"><div class="ps-card-head"><h2>Cash-flow calendar</h2><span class="ps-small">Next 6 months</span></div><div class="ps-card-body"><ul class="iv-flx">' + fl.map(function (f) {
       return '<li><span class="iv-flx-d"><b>' + f.data.slice(8) + '</b>' + ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'][+f.data.slice(5, 7) - 1] + '</span><span class="iv-flx-t"><b>' + e(f.r.ins.nome) + '</b><small>' + e(cart(f.r.cart).nome) + ' · ' + (f.capital ? 'Coupon + redemption' : 'Coupon') + '</small></span><span class="iv-flx-v">' + eur(f.cupao + f.capital) + '</span></li>';
-    }).join('') + '</ul><p class="ps-small iv-flx-n">Proposed automatically from the schedule and confirmed against the custodian (R-28).</p></div></section>';
+    }).join('') + '</ul><p class="ps-small iv-flx-n">Based on the cash-flow schedule.</p></div></section>';
   };
 
   /* ---------------- Instrumentos ---------------- */
@@ -95,7 +95,7 @@
   A.fInstrTxt = function (v) { fI.txt = v; document.querySelector('[data-lista-instr]').innerHTML = tabInstr(); };
   A.fInstrTipo = function (v) { fI.tipo = v; document.querySelector('[data-lista-instr]').innerHTML = tabInstr(); };
   A.novoInstr = function () {
-    APP.painel('New instrument', '<p class="ps-mut">One register for every portfolio and entity (R-20). Typing an ISIN that already exists opens that instrument instead.</p>' +
+    APP.painel('New instrument', '<p class="ps-mut">An existing ISIN opens the existing instrument.</p>' +
       '<div class="ps-form2"><label class="ps-campo"><span class="ps-lab">ISIN</span><input class="ps-in" data-on="isinDup" placeholder="PT00…"></label><label class="ps-campo"><span class="ps-lab">Type</span><select class="ps-sel">' + Object.keys(TIPO).map(function (k) { return '<option>' + TIPO[k] + '</option>'; }).join('') + '</select></label>' +
       '<label class="ps-campo"><span class="ps-lab">Name</span><input class="ps-in"></label><label class="ps-campo"><span class="ps-lab">Issuer</span><select class="ps-sel">' + Object.keys(INV.emitentes).map(function (k) { return '<option>' + e(INV.emitentes[k].nome) + '</option>'; }).join('') + '</select></label>' +
       '<label class="ps-campo"><span class="ps-lab">Coupon rate</span><input class="ps-in" placeholder="0,000%"></label><label class="ps-campo"><span class="ps-lab">Frequency</span><select class="ps-sel"><option>Annual</option><option>Semi-annual</option><option>Quarterly</option><option>Zero coupon</option></select></label>' +
@@ -109,7 +109,7 @@
   };
   A.ok = function (msg) { APP.fecharPan(); APP.aviso(msg, 'ok'); };
   A.importar = function (tipo) {
-    APP.painel('Import file · ' + e(tipo), '<p class="ps-mut">Validation order: format → mandatory columns → types and lists → references (ISIN, portfolio, issuer) → business rules → preview with errors by row → submit for approval (section 17).</p>' +
+    APP.painel('Import file · ' + e(tipo), '<p class="ps-mut">Checks: format, mandatory columns, types, references and business rules. Errors are shown by row before submitting.</p>' +
       '<div class="ps-fic"><b>Drop a CSV or Excel file</b><span class="ps-mut ps-small">or download the template first</span></div><div class="ps-sp"><button class="ps-btn" data-a="ok" data-v="Template downloaded">Download template</button></div>');
   };
 
@@ -166,7 +166,7 @@
   /* Detalhe do calculo (P8) */
   A.calc = function (id) {
     var l = INV.lotes.filter(function (x) { return x.id === id; })[0], x = MOTOR.explicar(INV, l, REF);
-    APP.painel('Calculation · ' + e(x.r.ins.nome) + ' · ' + id, '<p class="ps-mut">Every figure is recalculated from the lot, the cash-flow schedule and the price at ' + APP.dt(REF) + '. The same steps are used by the period close and exported to the auditor.</p>' +
+    APP.painel('Calculation · ' + e(x.r.ins.nome) + ' · ' + id, '<p class="ps-mut">Calculated from the lot, the cash-flow schedule and the price at ' + APP.dt(REF) + '.</p>' +
       '<table class="ps-t iv-calc"><tbody>' + x.passos.map(function (p) { return '<tr><td><b>' + e(p[0]) + '</b><span class="ps-mut ps-small" style="display:block">' + e(p[1]) + '</span></td><td class="dir ps-num">' + (p[3] === 'pct' ? APP.pct(p[2], 6) : p[2] == null ? '' : eur(p[2])) + '</td></tr>'; }).join('') + '</tbody></table>' +
       (x.fluxos.length ? '<h3 class="iv-h3">Remaining cash flows discounted at the EIR</h3>' + APP.tabela([
         { t: 'Date', k: function (f) { return APP.dt(f.data); } }, { t: 'Coupon', dir: 1, k: function (f) { return eur(f.cupao); } }, { t: 'Principal', dir: 1, k: function (f) { return eur(f.capital); } },
@@ -182,7 +182,7 @@
       var cob = c.pt ? v / c.pt : null;
       return APP.card(e(c.nome), '<div class="ps-sp">' + APP.chip(c.tipo, c.afeto ? 'info' : '') + '<span class="ps-tag">' + e(c.modelo) + '</span><span class="ps-tag">PCES class ' + e(c.classe) + '</span><span class="ps-tag">S.06.02: ' + e(c.sii) + '</span>' + (c.rff ? '<span class="ps-tag">' + e(c.rff) + '</span>' : '') + '</div>' +
         '<div class="ps-kpis iv-kpis3 ps-mt">' + APP.kpi('Solvency II value', APP.mi(v)) + APP.kpi('Book value', APP.mi(soma(ls, 'contab'))) + (c.pt ? APP.kpi('Coverage', APP.pct(cob, 1), 'Technical provisions ' + APP.mi(c.pt), cob < 1 ? 'k-err' : 'k-ok') : APP.kpi('Lots', ls.length)) + '</div>' +
-        (c.pt ? '<div class="ps-mt"><span class="ps-small ps-mut">Allocated assets vs technical provisions (R-17)</span>' + APP.barra(v, c.pt * 1.25, c.pt) + '</div>' : '') +
+        (c.pt ? '<div class="ps-mt"><span class="ps-small ps-mut">Allocated assets vs technical provisions</span>' + APP.barra(v, c.pt * 1.25, c.pt) + '</div>' : '') +
         '<ul class="iv-comp">' + Object.keys(classes).map(function (k) { return '<li><span>' + e(k) + '</span><b>' + APP.pct(classes[k] / v, 1) + '</b></li>'; }).join('') + '</ul>',
         '<a class="ps-btn peq" href="/posicoes/?c=' + c.id + '">Positions</a>');
     }).join('') + '</div>';
@@ -213,7 +213,7 @@
   };
   A.abrirPos = function (k, el, ev) { if (ev.target.closest('a,button')) return; abertas[k] = !abertas[k]; APP.render(); };
   A.fPosCart = function (v) { APP.ir('/posicoes/' + (v ? '?c=' + v : '')); };
-  A.fPosData = function () { APP.aviso('In the platform the positions are rebuilt at any date (P9). The mockup has one reference date.'); };
+  A.fPosData = function () { APP.aviso('In the platform the positions are rebuilt at any date. The mockup has one reference date.'); };
 
   /* ---------------- Afetacoes ---------------- */
   var nf = { lote: 'L012', q: 1000000, para: 'PPR' };
@@ -226,12 +226,12 @@
       return '<tr><td class="prim">' + e(c.nome) + '</td><td class="dir ps-num">' + eur(a) + '</td><td class="dir ps-num">' + eur(a + delta) + '</td><td class="dir ps-num">' + (c.pt ? APP.pct(a / c.pt, 1) + ' → <b>' + APP.pct((a + delta) / c.pt, 1) + '</b>' : '-') + '</td></tr>';
     };
     var avisos = [];
-    if (de.modelo !== para.modelo) avisos.push('Business model changes (' + e(de.modelo) + ' → ' + e(para.modelo) + '): needs an IFRS 9 reclassification with double approval (R-23, R-03).');
-    if (para.rff || de.rff) avisos.push('Ring-fenced fund involved: always needs approval and may affect policyholders\' profit sharing (R-16).');
+    if (de.modelo !== para.modelo) avisos.push('Business model changes (' + e(de.modelo) + ' → ' + e(para.modelo) + '): needs an IFRS 9 reclassification with double approval.');
+    if (para.rff || de.rff) avisos.push('Ring-fenced fund involved: always needs approval and may affect policyholders\' profit sharing.');
     if (nf.para === 'PPR' && r.em.nome === 'Banco B') { var pp = soma(porCart('PPR'), 'sii'), bb = soma(porCart('PPR').filter(function (x) { return x.em.nome === 'Banco B'; }), 'sii'); var lim = INV.limites.filter(function (x) { return x.base === 'Carteira PPR'; })[0], dep = (bb + v) / (pp + v); avisos.push('Limit "' + e(lim.dim) + '": Banco B goes from ' + APP.pct(bb / pp, 1) + ' to ' + APP.pct(dep, 1) + ' (alert ' + APP.pct(lim.alerta, 0) + ', max ' + APP.pct(lim.max, 0) + ').'); }
     if (r.cart === nf.para) avisos = ['Origin and destination are the same portfolio.'];
     return '<table class="ps-t"><thead><tr><th>Portfolio</th><th class="dir">Before</th><th class="dir">After</th><th class="dir">Coverage</th></tr></thead><tbody>' + linha(de, -v) + (r.cart !== nf.para ? linha(para, v) : '') + '</tbody></table>' +
-      '<p class="ps-small ps-mut ps-mt">Moves ' + qtd(r.ins, q) + ' at book value ' + eur(v) + ' (NR 9/2022-R, point 5: transfers are made at the carrying amount, with no gain or loss). Cost, EIR, classification and stage of the lot are kept: a reallocation is not a sale and does not by itself reclassify (R-23).' + (de.classe !== para.classe ? ' Generates an entry from account class ' + e(de.classe) + ' to ' + e(para.classe) + ' (R-54).' : '') + ' Fair value adjustments up to the transfer date stay with ' + e(de.nome) + '; later ones go to ' + e(para.nome) + ' (R-55).</p>' +
+      '<p class="ps-small ps-mut ps-mt">Moves ' + qtd(r.ins, q) + ' at book value ' + eur(v) + ', with no gain or loss (NR 9/2022-R, point 5). Cost, EIR, classification and stage are kept.' + (de.classe !== para.classe ? ' Generates an entry from account class ' + e(de.classe) + ' to ' + e(para.classe) + '.' : '') + ' Fair value adjustments up to the transfer date stay with ' + e(de.nome) + '; later ones go to ' + e(para.nome) + '.</p>' +
       avisos.map(function (a) { return '<div class="ps-aviso warn">' + a + '</div>'; }).join('');
   }
   B['afetacoes'] = function () {
@@ -241,7 +241,7 @@
       '<label class="ps-campo"><span class="ps-lab">Destination</span><select class="ps-sel" data-on="afPara">' + INV.carteiras.map(function (c) { return '<option value="' + c.id + '"' + (c.id === nf.para ? ' selected' : '') + '>' + e(c.nome) + '</option>'; }).join('') + '</select></label>' +
       '<label class="ps-campo"><span class="ps-lab">Effective date</span><input class="ps-in" type="date" value="' + REF + '" data-af-data></label>' +
       '<label class="ps-campo ps-form-1" style="grid-column:1/-1"><span class="ps-lab">Reason</span><textarea class="ps-ta" rows="2" placeholder="Mandatory" data-af-motivo></textarea></label></div>' +
-      '<h3 class="iv-h3">Impact before approval (R-24)</h3><div data-impacto>' + impacto() + '</div>' +
+      '<h3 class="iv-h3">Impact before approval</h3><div data-impacto>' + impacto() + '</div>' +
       '<div class="ps-sp ps-mt"><button class="ps-btn pri" data-a="reafetar">Submit for approval</button><span class="ps-small ps-mut">Recorded by ' + USER + '. Another person approves.</span></div>';
     var hist = APP.tabela([
       { t: 'ID', k: function (a) { return '<span class="ps-mono">' + a.id + '</span>'; } },
@@ -254,7 +254,7 @@
       { t: 'Approved', k: function (a) { return a.apr ? e(a.apr) + '<span class="ps-mut ps-small" style="display:block">' + APP.dt(a.aprEm) + '</span>' : '-'; } },
       { t: 'Status', k: function (a) { return APP.estado(a.estado); } }
     ], INV.afetacoes);
-    return '<div class="ps-col">' + APP.card('New allocation movement', form, '<div class="ps-seg"><button class="on">Reallocate</button><button>Partial allocation</button><button>Release to free</button></div>') + APP.card('Allocation history', hist + '<p class="ps-small ps-mut ps-mt">History is never overwritten. To correct a movement, record the reverse movement, linked to the first one (R-25).</p>') + '</div>';
+    return '<div class="ps-col">' + APP.card('New allocation movement', form, '<div class="ps-seg"><button class="on">Reallocate</button><button>Partial allocation</button><button>Release to free</button></div>') + APP.card('Allocation history', hist + '<p class="ps-small ps-mut ps-mt">History is never overwritten. To correct a movement, record the reverse movement, linked to the first one.</p>') + '</div>';
   };
   var refazImp = function () { document.querySelector('[data-impacto]').innerHTML = impacto(); };
   A.afLote = function (v) { nf.lote = v; refazImp(); };
@@ -281,7 +281,7 @@
         { t: 'Nominal / qty', dir: 1, k: function (o) { return qtd(insP(o.i), o.q); } }, { t: 'Price', dir: 1, k: function (o) { return o.preco ? String(o.preco).replace('.', ',') : '-'; } },
         { t: 'Accrued', dir: 1, k: function (o) { return o.jc ? eur(o.jc) : '-'; } }, { t: 'Amount', dir: 1, k: function (o) { return o.valor ? eur(o.valor) + (o.ret ? '<span class="ps-mut ps-small" style="display:block">WHT ' + eur(o.ret) + '</span>' : '') : '-'; } },
         { t: 'Status', k: function (o) { return APP.estado(o.estado) + (o.nota ? '<span class="ps-mut ps-small" style="display:block">' + e(o.nota) + '</span>' : ''); } }
-      ], ops) + '<p class="ps-small ps-mut ps-mt">Approved transactions are never edited: reverse and record again (R-29). Dates in a closed period are refused (R-30).</p>') + '</div>';
+      ], ops) + '<p class="ps-small ps-mut ps-mt">Approved transactions are not edited: reverse and record again. Dates in a closed period are refused.</p>') + '</div>';
   };
   A.fOp = function (v) { fOp = v || ''; APP.render(); };
   var op = { i: 'I07', liq: '2026-11-04', q: 1000000, p: 100.85, jcN: 0 };
@@ -289,7 +289,7 @@
     var i = insP(op.i), jc = (+op.q || 0) * MOTOR.juroCorrido(i, op.liq), dif = (+op.jcN || 0) - jc;
     var bloq = Math.abs(dif) > 0.01;
     return '<table class="ps-t iv-calc"><tbody><tr><td>Clean amount</td><td class="dir ps-num">' + eur(op.q * op.p / 100) + '</td></tr><tr><td>Accrued interest calculated (' + e(i.base || '-') + ')</td><td class="dir ps-num">' + eur(jc) + '</td></tr><tr><td>Accrued interest on broker note</td><td class="dir ps-num">' + eur(+op.jcN || 0) + '</td></tr><tr><td><b>Difference</b></td><td class="dir ps-num"><b>' + eur(dif) + '</b></td></tr><tr><td><b>Total to settle</b></td><td class="dir ps-num"><b>' + eur(op.q * op.p / 100 + jc) + '</b></td></tr></tbody></table>' +
-      (bloq ? '<div class="ps-aviso err">The difference is above the 0,01 tolerance: justify it before submitting (R-26).</div>' : '<p class="ps-txt-ok ps-small ps-mt">Accrued interest matches the broker note.</p>') +
+      (bloq ? '<div class="ps-aviso err">The difference is above the 0,01 tolerance: justify it before submitting.</div>' : '<p class="ps-txt-ok ps-small ps-mt">Accrued interest matches the broker note.</p>') +
       '<div class="ps-sp ps-mt"><button class="ps-btn pri" data-a="ok" data-v="Transaction submitted for approval"' + (bloq ? ' disabled' : '') + '>Submit for approval</button></div>';
   }
   A.novaOp = function () {
@@ -313,7 +313,7 @@
       { t: 'Instrument', k: link }, { t: 'Price', dir: 1, k: function (i) { return String(i.preco).replace('.', ','); } }, { t: 'Source', k: function (i) { return e(i.fonte); } },
       { t: 'Issue', k: function (i) { return i.manual ? APP.chip('Manual price · pending approval', 'rev') : APP.chip(i.excecao, 'warn'); } },
       { t: '', k: function (i) { return i.manual ? '<a class="ps-btn peq" href="/aprovacoes/">Open approval</a>' : '<button class="ps-btn peq" data-a="ok" data-v="Price confirmed with justification">Confirm with justification</button>'; } }
-    ], exc) + '<p class="ps-small ps-mut ps-mt">Checks on every load: missing price, stale price (more than 5 days), daily change above tolerance, bond price outside 0–200% (R-39). Exceptions block the close.</p>', '<button class="ps-btn" data-a="importar" data-v="Prices">Import prices</button>') +
+    ], exc) + '<p class="ps-small ps-mut ps-mt">Checks on every load: missing price, stale price (more than 5 days), daily change above tolerance, bond price outside 0–200%. Exceptions block the close.</p>', '<button class="ps-btn" data-a="importar" data-v="Prices">Import prices</button>') +
       APP.card('Prices at ' + APP.dt(REF), APP.tabela([
         { t: 'Instrument', k: link }, { t: 'Price', dir: 1, k: function (i) { return String(i.preco).replace('.', ','); } }, { t: 'Quote', k: function (i) { return divida(i) ? '% of nominal (clean)' : i.tipo === 'fundo' ? 'NAV per unit' : 'Per share'; } },
         { t: 'Source', k: function (i) { return e(i.fonte); } }, { t: 'IFRS 13', k: function (i) { return APP.chip('Level ' + i.nivel, i.nivel === 3 ? 'warn' : i.nivel === 2 ? 'info' : 'ok'); } },
@@ -333,7 +333,7 @@
         { t: 'PD', dir: 1, k: function (r) { return APP.pct(r.pd, 4); } }, { t: 'LGD', dir: 1, k: function (r) { return APP.pct(r.lgd, 0); } },
         { t: 'EAD', dir: 1, k: function (r) { return eur(r.ead); } }, { t: 'ECL', dir: 1, k: function (r) { return eur(r.ecl); } },
         { t: 'Booked in', k: function (r) { return r.cl === 'CA' ? 'Asset (allowance)' : 'OCI reserve'; } }
-      ], ls) + '<p class="ps-small ps-mut ps-mt">ECL = EAD × PD × LGD with the PD and LGD tables of the backoffice (R-06). Stage 2 when investment grade is lost since purchase or the rating falls 3 notches; investment grade stays in stage 1 (low credit risk, R-07). A manual override needs approval and evidence (R-09).</p>');
+      ], ls) + '<p class="ps-small ps-mut ps-mt">ECL = EAD × PD × LGD with the PD and LGD tables of the backoffice. Stage 2 when investment grade is lost since purchase or the rating falls 3 notches; investment grade stays in stage 1 (low credit risk). A manual override needs approval and evidence.</p>');
   };
 
   /* ---------------- Limites ---------------- */
@@ -355,7 +355,7 @@
       { t: 'Alert', dir: 1, k: function (l) { return APP.pct(l.alerta, 0); } }, { t: 'Max', dir: 1, k: function (l) { return APP.pct(l.max, 0); } },
       { t: 'Source', k: function (l) { return e(l.origem); } },
       { t: 'Status', k: function (l) { var x = exposicao(l); return x > l.max ? APP.chip(l.justif ? 'Breach · justified' : 'Breach · to justify', 'err') + '<span class="ps-mut ps-small" style="display:block;max-width:280px;white-space:normal">' + e(l.justif || '') + '</span>' : x > l.alerta ? APP.chip('Alert', 'warn') : APP.chip('Within limit', 'ok'); } }
-    ], INV.limites) + '<p class="ps-small ps-mut ps-mt">Checked before (on submitting a transaction or reallocation) and after (daily and at close). Groups of issuers are aggregated by the issuer group (R-49).</p>');
+    ], INV.limites) + '<p class="ps-small ps-mut ps-mt">Checked on submitting a transaction or reallocation, daily and at close. Issuers are aggregated by group.</p>');
   };
 
   /* ---------------- Contabilidade ---------------- */
@@ -393,9 +393,9 @@
         { t: 'Class', k: function (x) { return APP.clChip(x.cl); } },
         { t: 'Debit', k: function (x) { return e(x.d); } }, { t: 'Credit', k: function (x) { return e(x.c); } },
         { t: 'Amount', dir: 1, k: function (x) { return eur(x.v); } }
-      ], lc, { rodape: '<tr class="iv-tot"><td colspan="4"><b>Debits = credits</b> · ' + lc.length + ' entries · every line keeps the rule, the transaction and the lot (R-43)</td><td class="dir ps-num"><b>' + eur(tot) + '</b></td></tr>' }),
+      ], lc, { rodape: '<tr class="iv-tot"><td colspan="4"><b>Debits = credits</b> · ' + lc.length + ' entries </td><td class="dir ps-num"><b>' + eur(tot) + '</b></td></tr>' }),
       '<button class="ps-btn" data-a="csv">Export to ERP (CSV)</button>') + '</div>' +
-      APP.card('Close ' + e(INV.periodo), '<ol class="iv-steps">' + INV.fecho.map(function (f) { return '<li class="' + f.s + '"><b>' + e(f.t) + '</b><span>' + e(f.d) + '</span></li>'; }).join('') + '</ol><button class="ps-btn pri" disabled title="Open items block the close">Close period</button><p class="ps-small ps-mut ps-mt">Closing keeps a snapshot so any report can be reproduced later (P9, C-10).</p>') + '</div>';
+      APP.card('Close ' + e(INV.periodo), '<ol class="iv-steps">' + INV.fecho.map(function (f) { return '<li class="' + f.s + '"><b>' + e(f.t) + '</b><span>' + e(f.d) + '</span></li>'; }).join('') + '</ol><button class="ps-btn pri" disabled title="Open items block the close">Close period</button><p class="ps-small ps-mut ps-mt">Closing keeps a snapshot of the period.</p>') + '</div>';
   };
   A.csv = function () {
     var lc = lancamentos(), linhas = [['Period', 'Entity', 'Event', 'Lot', 'Instrument', 'Debit account', 'Credit account', 'Amount', 'Currency']].concat(lc.map(function (x) { return [INV.periodo, INV.entidade.id, x.ev, x.ref, x.ins, x.d, x.c, x.v.toFixed(2), 'EUR']; }));
@@ -406,7 +406,7 @@
 
   /* ---------------- Relatorios ---------------- */
   B['relatorios'] = function () {
-    var rel = [['Investment inventory', 'Every lot with cost, amortised cost, fair value, allocation and IFRS 9 class'], ['Allocation and coverage map', 'Technical provisions vs allocated assets by portfolio (R-17)'], ['S.06.02 List of assets', 'Solvency II, item by item, ready for the reporting tool'], ['S.09.01 Income, gains and losses', 'Interest, dividends, realised and unrealised gains by asset'], ['Movement schedule', 'Opening, purchases, sales, interest, fair value, ECL, closing (IFRS 7)'], ['Fair value hierarchy', 'Levels 1, 2 and 3 and level 3 movements (IFRS 13)'], ['ECL by stage', 'Stages and movements of the period'], ['Limit breaches', 'Open and historical breaches with justification']];
+    var rel = [['Investment inventory', 'Lots with cost, fair value, allocation and IFRS 9 class'], ['Allocation and coverage map', 'Technical provisions vs allocated assets by portfolio'], ['S.06.02 List of assets', 'Solvency II list of assets'], ['S.09.01 Income, gains and losses', 'Interest, dividends, realised and unrealised gains by asset'], ['Movement schedule', 'Opening, movements and closing balance (IFRS 7)'], ['Fair value hierarchy', 'Levels 1, 2 and 3 and level 3 movements (IFRS 13)'], ['ECL by stage', 'Stages and movements of the period'], ['Limit breaches', 'Open and historical breaches with justification']];
     var s06 = APP.tabela([
       { t: 'Asset ID (C0040)', k: function (r) { return '<span class="ps-mono">' + e(r.ins.isin || r.ins.codigo) + '</span>'; } },
       { t: 'Portfolio', k: function (r) { return e(cart(r.cart).sii); } },
@@ -432,7 +432,7 @@
       { t: 'Type', k: function (a) { return APP.chip(a.tipo, 'rev'); } }, { t: 'Reference', k: function (a) { return '<span class="ps-mono">' + a.ref + '</span>'; } },
       { t: 'What', k: function (a) { return '<b>' + e(a.desc) + '</b><span class="ps-mut ps-small" style="display:block">' + e(a.imp) + '</span>'; } },
       { t: 'Requested', k: function (a) { return e(a.por) + '<span class="ps-mut ps-small" style="display:block">' + APP.dt(a.em) + '</span>'; } },
-      { t: '', k: function (a) { return a.por === USER ? '<span class="ps-small ps-mut">You recorded this: another person approves (R-18)</span>' : '<div class="ps-sp"><button class="ps-btn ok peq" data-a="aprovar" data-v="' + a.ref + '">Approve</button><button class="ps-btn err peq" data-a="rejeitar" data-v="' + a.ref + '">Reject</button></div>'; } }
+      { t: '', k: function (a) { return a.por === USER ? '<span class="ps-small ps-mut">Recorded by you: another person approves</span>' : '<div class="ps-sp"><button class="ps-btn ok peq" data-a="aprovar" data-v="' + a.ref + '">Approve</button><button class="ps-btn err peq" data-a="rejeitar" data-v="' + a.ref + '">Reject</button></div>'; } }
     ], lista));
   };
   /* Decisoes e reafetacoes gravam no Supabase (inv_decidir, inv_reafetar) e recarregam os dados */
@@ -451,7 +451,7 @@
   };
   A.reafetar = function () {
     var m = document.querySelector('[data-af-motivo]').value.trim(), d = document.querySelector('[data-af-data]').value;
-    if (!m) { APP.aviso('The reason is mandatory (R-15)', 'err'); return; }
+    if (!m) { APP.aviso('The reason is mandatory', 'err'); return; }
     gravar('inv_reafetar', { p_lote: nf.lote, p_quantidade: +nf.q, p_destino: nf.para, p_data: d, p_motivo: m }, 'Reallocation submitted for approval');
   };
 
@@ -474,16 +474,16 @@
   B['backoffice'] = function () {
     var abas = [['regras', 'Accounting rules'], ['carteiras', 'Portfolio types & dimensions'], ['ecl', 'PD & LGD tables'], ['precos', 'Price tolerances'], ['gerais', 'Entity & methods']];
     var corpo;
-    if (abaB === 'regras') corpo = '<p class="ps-mut">Event × IFRS 9 class × portfolio type × asset type → accounts (R-42). The accounts of the chart of accounts in force are loaded as data, not code. Changes need approval and are versioned with start and end dates.</p>' + APP.tabela([
+    if (abaB === 'regras') corpo = '<p class="ps-mut">Event × IFRS 9 class × portfolio type × asset type → accounts. Changes need approval.</p>' + APP.tabela([
       { t: 'Event', k: function (r) { return '<b>' + e(r.ev) + '</b>'; } }, { t: 'Class', k: function (r) { return e(r.cl); } }, { t: 'Portfolio', k: function (r) { return e(r.cart); } }, { t: 'Asset', k: function (r) { return e(r.at); } }, { t: 'Debit', k: function (r) { return e(r.d); } }, { t: 'Credit', k: function (r) { return e(r.c); } }
     ], INV.regras);
-    else if (abaB === 'carteiras') corpo = '<p class="ps-mut">Portfolio types from table 9 of the chart of accounts (PCES, ASF Regulatory Standard 9/2022-R). Sub-portfolios always sit inside one of them, so entries and PCES maps come out right.</p>' + APP.tabela([{ t: 'Portfolio type (table 9)', k: function (x) { return '<b>' + e(x[0]) + '</b>'; } }, { t: 'Account class', k: function (x) { return x[1]; } }, { t: 'Rule', k: function (x) { return e(x[2]); } }],
-      [['a) Vida com participação nos resultados, sem investimento autónomo', '20', 'Transfers with profit sharing: reserve split by portfolio (R-55)'], ['b) Vida com participação nos resultados, com investimento autónomo (por fundo autónomo)', '20', 'Reallocation always needs approval (R-16)'], ['c) Componente de depósito e contratos de investimento (por fundo autónomo)', '21', '-'], ['d) Outros seguros de vida, sem investimento autónomo', '20', '-'], ['e) Outros seguros de vida, com investimento autónomo (por fundo autónomo)', '20', 'Reallocation always needs approval (R-16)'], ['f) Seguro de acidentes de trabalho', '22', '-'], ['g) Restantes seguros não vida', '22', '-'], ['h) Valores livres', '23', 'Not allocated']]) +
+    else if (abaB === 'carteiras') corpo = '<p class="ps-mut">Portfolio types from table 9 of the PCES (ASF Regulatory Standard 9/2022-R).</p>' + APP.tabela([{ t: 'Portfolio type (table 9)', k: function (x) { return '<b>' + e(x[0]) + '</b>'; } }, { t: 'Account class', k: function (x) { return x[1]; } }, { t: 'Rule', k: function (x) { return e(x[2]); } }],
+      [['a) Vida com participação nos resultados, sem investimento autónomo', '20', 'Transfers with profit sharing: reserve split by portfolio'], ['b) Vida com participação nos resultados, com investimento autónomo (por fundo autónomo)', '20', 'Reallocation always needs approval'], ['c) Componente de depósito e contratos de investimento (por fundo autónomo)', '21', '-'], ['d) Outros seguros de vida, sem investimento autónomo', '20', '-'], ['e) Outros seguros de vida, com investimento autónomo (por fundo autónomo)', '20', 'Reallocation always needs approval'], ['f) Seguro de acidentes de trabalho', '22', '-'], ['g) Restantes seguros não vida', '22', '-'], ['h) Valores livres', '23', 'Not allocated']]) +
       '<h3 class="iv-h3">Dimensions</h3><div class="ps-sp">' + ['Ramo', 'Produto', 'Fundo', 'Natureza das responsabilidades', 'Grupo de contratos IFRS 17'].map(function (d) { return '<span class="ps-tag">' + d + '</span>'; }).join('') + '</div>';
-    else if (abaB === 'ecl') corpo = '<div class="ps-grid2">' + APP.tabela([{ t: 'Rating', k: function (k) { return '<b>' + k + '</b>'; } }, { t: 'PD 12 months', dir: 1, k: function (k) { return APP.pct(INV.pd12[k], 2); } }], Object.keys(INV.pd12)) + APP.tabela([{ t: 'Issuer type', k: function (k) { return '<b>' + e(k) + '</b>'; } }, { t: 'LGD', dir: 1, k: function (k) { return APP.pct(INV.lgd[k], 0); } }], Object.keys(INV.lgd)) + '</div><p class="ps-small ps-mut ps-mt">Illustrative values. Stage criteria: loss of investment grade, 3 notches down, more than 30 days past due, manual watch list (R-07).</p>';
+    else if (abaB === 'ecl') corpo = '<div class="ps-grid2">' + APP.tabela([{ t: 'Rating', k: function (k) { return '<b>' + k + '</b>'; } }, { t: 'PD 12 months', dir: 1, k: function (k) { return APP.pct(INV.pd12[k], 2); } }], Object.keys(INV.pd12)) + APP.tabela([{ t: 'Issuer type', k: function (k) { return '<b>' + e(k) + '</b>'; } }, { t: 'LGD', dir: 1, k: function (k) { return APP.pct(INV.lgd[k], 0); } }], Object.keys(INV.lgd)) + '</div><p class="ps-small ps-mut ps-mt">Illustrative values. Stage criteria: loss of investment grade, 3 notches down, more than 30 days past due, manual watch list.</p>';
     else if (abaB === 'precos') corpo = APP.tabela([{ t: 'Asset class', k: function (x) { return '<b>' + e(x[0]) + '</b>'; } }, { t: 'Max daily change', dir: 1, k: function (x) { return x[1]; } }, { t: 'Stale after', dir: 1, k: function (x) { return x[2]; } }, { t: 'Source hierarchy', k: function (x) { return e(x[3]); } }],
       [['Government bonds', '2%', '3 days', 'Fecho de mercado → Contribuidor → Manual'], ['Corporate bonds', '3% (4% pending)', '5 days', 'Contribuidor → Manual'], ['Listed equity', '10%', '3 days', 'Fecho de mercado → Manual'], ['Funds', '5%', '5 days', 'NAV do gestor'], ['Unlisted', '-', '120 days', 'Avaliação interna (approval)']]);
-    else corpo = '<dl class="iv-dl">' + [['Entity', INV.entidade.nome], ['Functional currency', INV.entidade.moeda], ['Lot relief method', INV.entidade.metodoLotes + ' (R-27)'], ['FX source', 'ECB reference rates'], ['Accrued interest tolerance', '0,01 EUR (R-26)'], ['Closed periods', 'Until September 2026'], ['Chart of accounts', 'PCES (version to confirm)']].map(function (c) { return '<div><dt>' + e(c[0]) + '</dt><dd>' + e(c[1]) + '</dd></div>'; }).join('') + '</dl>';
+    else corpo = '<dl class="iv-dl">' + [['Entity', INV.entidade.nome], ['Functional currency', INV.entidade.moeda], ['Lot relief method', INV.entidade.metodoLotes + ''], ['FX source', 'ECB reference rates'], ['Accrued interest tolerance', '0,01 EUR'], ['Closed periods', 'Until September 2026'], ['Chart of accounts', 'PCES (version to confirm)']].map(function (c) { return '<div><dt>' + e(c[0]) + '</dt><dd>' + e(c[1]) + '</dd></div>'; }).join('') + '</dl>';
     return '<div class="ps-bo"><nav class="ps-bo-tabs">' + abas.map(function (a) { return '<button type="button" class="ps-bo-tab' + (a[0] === abaB ? ' on' : '') + '" data-a="abaB" data-v="' + a[0] + '">' + a[1] + '</button>'; }).join('') + '</nav>' +
       APP.card(abas.filter(function (a) { return a[0] === abaB; })[0][1], corpo, '<button class="ps-btn peq" data-a="ok" data-v="Change submitted for approval">Edit</button>') + '</div>';
   };
