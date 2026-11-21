@@ -2684,3 +2684,6 @@ a.db-hero-k:hover{background:rgba(255,255,255,.2)}
 .ps-card.iv-cal{background:linear-gradient(160deg,var(--primary) 0%,var(--primary-dark) 55%,var(--primary-deep) 100%)}
 .ps-est-t a.ps-gk-cta{text-decoration:none}
 .ps-t .ps-mono{white-space:nowrap}
+/* Numeros sempre alinhados a direita, tambem quando a tabela vira cartao no telemovel */
+.ps-t th.dir,.ps-t td.dir{text-align:right}
+@media(max-width:820px){.ps-t td.dir{justify-content:space-between;text-align:right}.ps-t td.dir:not([data-l]){justify-content:flex-end}.ps-t tr.iv-tot td:empty{display:none}}

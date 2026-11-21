@@ -78,7 +78,7 @@
       { t: 'Type', k: function (i) { return e(TIPO[i.tipo]); } },
       { t: 'Issuer', k: function (i) { var m = INV.emitentes[i.em]; return e(m.nome) + '<span class="ps-mut ps-small" style="display:block">' + e(m.tipo) + ' · ' + e(m.pais) + '</span>'; } },
       { t: 'CIC', k: function (i) { return '<span class="ps-mono">' + e(i.cic) + '</span>'; } },
-      { t: 'Coupon', k: function (i) { return i.taxa != null ? APP.pct(i.taxa, i.taxa ? 3 : 0) + (i.freq === 2 ? ' semi' : '') : '-'; } },
+      { t: 'Coupon', dir: 1, k: function (i) { return i.taxa != null ? APP.pct(i.taxa, i.taxa ? 3 : 0) + (i.freq === 2 ? ' semi' : '') : '-'; } },
       { t: 'Maturity', k: function (i) { return APP.dt(i.venc); } },
       { t: 'Rating', k: function (i) { return e(INV.emitentes[i.em].rating); } },
       { t: 'Held', dir: 1, k: function (i) { return qtd(i, soma(L.filter(function (r) { return r.ins === i; }), 'q')); } },
@@ -206,7 +206,7 @@
       }).join('');
       return tr;
     }).join('');
-    var tot = '<tr class="iv-tot"><td class="prim">Total</td><td></td><td></td>' + ['ca', 'jc', 'jv', 'contab', 'reserva', 'ecl'].map(function (k) { return '<td class="dir ps-num">' + eur(soma(ls, k)) + '</td>'; }).join('') + '</tr>';
+    var tot = '<tr class="iv-tot"><td class="prim">Total</td><td></td><td></td>' + ['ca', 'jc', 'jv', 'contab', 'reserva', 'ecl'].map(function (k, n) { return '<td class="dir ps-num" data-l="' + cols[n + 3] + '">' + eur(soma(ls, k)) + '</td>'; }).join('') + '</tr>';
     return '<div class="ps-filtros"><label class="ps-campo"><span class="ps-lab">Portfolio</span><select class="ps-sel" data-on="fPosCart"><option value="">All portfolios</option>' + INV.carteiras.map(function (c) { return '<option value="' + c.id + '"' + (fc === c.id ? ' selected' : '') + '>' + e(c.nome) + '</option>'; }).join('') + '</select></label>' +
       '<label class="ps-campo"><span class="ps-lab">Date</span><input class="ps-in" type="date" value="' + REF + '" data-on="fPosData"></label><button class="ps-btn" data-a="ok" data-v="Inventory exported to Excel">Export inventory</button></div>' +
       '<section class="ps-card"><div class="ps-card-body"><div class="ps-tw"><table class="ps-t"><thead><tr>' + cols.map(function (c, n) { return '<th' + (n > 1 ? ' class="dir"' : '') + '>' + c + '</th>'; }).join('') + '</tr></thead><tbody>' + linhas + tot + '</tbody></table></div></div></section>';
