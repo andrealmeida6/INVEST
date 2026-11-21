@@ -94,6 +94,18 @@ Legenda: **Oficial** = texto da norma em português; **PCES** = Norma Regulament
 | Investments in subsidiaries / associates | partes de capital em filiais, associadas e empreendimentos conjuntos (20 1), mensuradas ao custo, ao justo valor ou pela equivalência patrimonial | — | idem |
 | Debt securities / equity and fund units | títulos de dívida; instrumentos de capital e unidades de participação | — | idem |
 
+### Controlo e fecho
+
+| Inglês | Uso em Portugal | Plataforma |
+| --- | --- | --- |
+| Subledger | Não se usa "subrazão". Diz-se **inventário de investimentos** (ou mapa de inventário de títulos) e **contabilidade geral** | **inventário de investimentos** |
+| General ledger / trial balance | **contabilidade geral** / **balancete** | idem |
+| Reconciliation | **reconciliação** (também "conciliação" nos extratos bancários) | **reconciliação** |
+| Custodian statement | **extrato do depositário** | idem |
+| Roll-forward | **mapa de movimentos** | idem |
+| Deferred tax (on the fair value reserve) | **impostos diferidos**; PCES: **12 Reserva por impostos diferidos** | idem |
+| Hold-to-collect sales test | **vendas de carteiras "deter para recolher"** (frequência e significância das vendas, IFRS 9 B4.1.3) | idem |
+
 ### Solvência II
 
 | Inglês | Termo em português | Fonte | Plataforma |

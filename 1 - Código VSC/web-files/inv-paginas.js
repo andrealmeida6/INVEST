@@ -38,7 +38,10 @@
   };
 
   B['inicio-alertas'] = function () {
+    var rec = resumoReconciliacoes();
     var itens = [
+      [rec.gl ? 'err' : 'ok', 'General ledger reconciliation: ' + (rec.gl ? rec.gl + ' differences open' : 'no differences'), 'Investment inventory against the trial balance at ' + APP.dt(REF), '/reconciliacoes/?t=gl'],
+      [rec.dep ? 'warn' : 'ok', 'Custodian reconciliation: ' + (rec.dep ? rec.dep + ' differences open' : 'no differences'), 'Positions and cash against the custodian statement', '/reconciliacoes/'],
       ['rev', INV.aprovacoes.length + ' items waiting for approval', 'Transactions, reallocations, manual prices, stage changes', '/aprovacoes/'],
       ['err', 'Limit breach: rating below BBB-', 'Energia C 2,25% 2032 downgraded to BB+ · justified, owner Rui Matos', '/limites/'],
       ['warn', 'Price exception', 'Energia C 2,25% 2032: daily change −4,1% (tolerance 3%)', '/valorizacoes/'],
@@ -209,7 +212,7 @@
     var tot = '<tr class="iv-tot"><td class="prim">Total</td><td></td><td></td>' + ['ca', 'jc', 'jv', 'contab', 'reserva', 'ecl'].map(function (k, n) { return '<td class="dir ps-num" data-l="' + cols[n + 3] + '">' + eur(soma(ls, k)) + '</td>'; }).join('') + '</tr>';
     return '<div class="ps-filtros"><label class="ps-campo"><span class="ps-lab">Portfolio</span><select class="ps-sel" data-on="fPosCart"><option value="">All portfolios</option>' + INV.carteiras.map(function (c) { return '<option value="' + c.id + '"' + (fc === c.id ? ' selected' : '') + '>' + e(c.nome) + '</option>'; }).join('') + '</select></label>' +
       '<label class="ps-campo"><span class="ps-lab">Date</span><input class="ps-in" type="date" value="' + REF + '" data-on="fPosData"></label><button class="ps-btn" data-a="ok" data-v="Inventory exported to Excel">Export inventory</button></div>' +
-      '<section class="ps-card"><div class="ps-card-body"><div class="ps-tw"><table class="ps-t"><thead><tr>' + cols.map(function (c, n) { return '<th' + (n > 1 ? ' class="dir"' : '') + '>' + c + '</th>'; }).join('') + '</tr></thead><tbody>' + linhas + tot + '</tbody></table></div></div></section>';
+      kpisReserva(ls) + '<section class="ps-card"><div class="ps-card-body"><div class="ps-tw"><table class="ps-t"><thead><tr>' + cols.map(function (c, n) { return '<th' + (n > 1 ? ' class="dir"' : '') + '>' + c + '</th>'; }).join('') + '</tr></thead><tbody>' + linhas + tot + '</tbody></table></div></div></section>';
   };
   A.abrirPos = function (k, el, ev) { if (ev.target.closest('a,button')) return; abertas[k] = !abertas[k]; APP.render(); };
   A.fPosCart = function (v) { APP.ir('/posicoes/' + (v ? '?c=' + v : '')); };
@@ -347,7 +350,8 @@
     else f = function (r) { return r.ins.cic.slice(0, 3) === 'XL3'; };
     return soma(base.filter(f), 'sii') / tot;
   }
-  B['limites'] = function () {
+  B['limites'] = function () { return '<div class="ps-col">' + B['limites-uso']() + cardVendas() + '</div>'; };
+  B['limites-uso'] = function () {
     return APP.card('Use of limits · ' + APP.dt(REF) + ' · base Solvency II value', APP.tabela([
       { t: 'Limit', k: function (l) { return '<b>' + e(l.dim) + '</b><span class="ps-mut ps-small" style="display:block">' + e(l.alvo) + ' · ' + e(l.base) + '</span>'; } },
       { t: 'Use', dir: 1, k: function (l) { return '<b>' + APP.pct(exposicao(l), 1) + '</b>'; } },
@@ -383,6 +387,12 @@
       var t = MOTOR.valorTransferencia(INV, lt, af.data, af.q), ins = insP(lt.i);
       out.push({ ev: 'Transfer ' + af.id, ref: lt.id, ins: ins.nome, d: para.classe + ' · ' + para.nome, c: de.classe + ' · ' + de.nome, v: t.valor, cl: lt.cl });
     });
+    /* Impostos diferidos: variacao do periodo da reserva de justo valor x taxa */
+    var taxa = (INV.param || {}).taxa_impostos_diferidos || 0, pa = (INV.param || {}).precos_anteriores;
+    var resAnt = MOTOR.lotes(INV, ant, pa).reduce(function (s, r) { return s + (r.cl === 'FVOCI' || r.cl === 'FVOCI-EQ' ? r.reserva : 0); }, 0);
+    var resRef = L.reduce(function (s, r) { return s + (r.cl === 'FVOCI' || r.cl === 'FVOCI-EQ' ? r.reserva : 0); }, 0);
+    var dImp = (resRef - resAnt) * taxa;
+    if (taxa && Math.abs(dImp) >= 0.005) out.push({ ev: 'Deferred tax', ref: '-', ins: 'Fair value reserve · ' + APP.pct(taxa, 1), d: dImp > 0 ? '12 Reserva por impostos diferidos' : 'Passivos por impostos diferidos', c: dImp > 0 ? 'Passivos por impostos diferidos' : '12 Reserva por impostos diferidos', v: Math.abs(dImp), cl: 'FVOCI' });
     return out;
   }
   B['contabilidade'] = function () {
@@ -483,11 +493,128 @@
     else if (abaB === 'ecl') corpo = '<div class="ps-grid2">' + APP.tabela([{ t: 'Rating', k: function (k) { return '<b>' + k + '</b>'; } }, { t: 'PD 12 months', dir: 1, k: function (k) { return APP.pct(INV.pd12[k], 2); } }], Object.keys(INV.pd12)) + APP.tabela([{ t: 'Issuer type', k: function (k) { return '<b>' + e(k) + '</b>'; } }, { t: 'LGD', dir: 1, k: function (k) { return APP.pct(INV.lgd[k], 0); } }], Object.keys(INV.lgd)) + '</div><p class="ps-small ps-mut ps-mt">Illustrative values. Stage criteria: loss of investment grade, 3 notches down, more than 30 days past due, manual watch list.</p>';
     else if (abaB === 'precos') corpo = APP.tabela([{ t: 'Asset class', k: function (x) { return '<b>' + e(x[0]) + '</b>'; } }, { t: 'Max daily change', dir: 1, k: function (x) { return x[1]; } }, { t: 'Stale after', dir: 1, k: function (x) { return x[2]; } }, { t: 'Source hierarchy', k: function (x) { return e(x[3]); } }],
       [['Government bonds', '2%', '3 days', 'Fecho de mercado → Contribuidor → Manual'], ['Corporate bonds', '3% (4% pending)', '5 days', 'Contribuidor → Manual'], ['Listed equity', '10%', '3 days', 'Fecho de mercado → Manual'], ['Funds', '5%', '5 days', 'NAV do gestor'], ['Unlisted', '-', '120 days', 'Avaliação interna (approval)']]);
-    else corpo = '<dl class="iv-dl">' + [['Entity', INV.entidade.nome], ['Functional currency', INV.entidade.moeda], ['Lot relief method', INV.entidade.metodoLotes + ''], ['FX source', 'ECB reference rates'], ['Accrued interest tolerance', '0,01 EUR'], ['Closed periods', 'Until September 2026'], ['Chart of accounts', 'PCES (version to confirm)']].map(function (c) { return '<div><dt>' + e(c[0]) + '</dt><dd>' + e(c[1]) + '</dd></div>'; }).join('') + '</dl>';
+    else corpo = '<dl class="iv-dl">' + [['Entity', INV.entidade.nome], ['Functional currency', INV.entidade.moeda], ['Deferred tax rate', APP.pct(((INV.param || {}).taxa_impostos_diferidos || 0), 1) + ' (illustrative)'], ['Sales limit, hold-to-collect portfolios', 'Alert ' + APP.pct((((INV.param || {}).limite_vendas_deter_recolher || {}).alerta || 0), 0) + ' · maximum ' + APP.pct((((INV.param || {}).limite_vendas_deter_recolher || {}).maximo || 0), 0) + ' of the portfolio in 12 months'], ['Lot relief method', INV.entidade.metodoLotes + ''], ['FX source', 'ECB reference rates'], ['Accrued interest tolerance', '0,01 EUR'], ['Closed periods', 'Until September 2026'], ['Chart of accounts', 'PCES (version to confirm)']].map(function (c) { return '<div><dt>' + e(c[0]) + '</dt><dd>' + e(c[1]) + '</dd></div>'; }).join('') + '</dl>';
     return '<div class="ps-bo"><nav class="ps-bo-tabs">' + abas.map(function (a) { return '<button type="button" class="ps-bo-tab' + (a[0] === abaB ? ' on' : '') + '" data-a="abaB" data-v="' + a[0] + '">' + a[1] + '</button>'; }).join('') + '</nav>' +
       APP.card(abas.filter(function (a) { return a[0] === abaB; })[0][1], corpo, '<button class="ps-btn peq" data-a="ok" data-v="Change submitted for approval">Edit</button>') + '</div>';
   };
   A.abaB = function (v) { abaB = v; APP.render(); };
+
+
+  /* ---------------- Reserva de justo valor e impostos diferidos ---------------- */
+  function kpisReserva(ls) {
+    var taxa = (INV.param || {}).taxa_impostos_diferidos || 0;
+    var res = ls.reduce(function (s, r) { return s + (r.cl === 'FVOCI' || r.cl === 'FVOCI-EQ' ? r.reserva : 0); }, 0), imp = MOTOR.impostoDiferido(res, taxa);
+    return '<div class="ps-kpis iv-kpis">' + APP.kpi('Fair value reserve (gross)', eur(res)) + APP.kpi('Deferred tax', eur(imp), 'Rate ' + APP.pct(taxa, 1)) + APP.kpi('Fair value reserve (net)', eur(res + imp), 'Account 11 and 12') + '</div>';
+  }
+
+  /* ---------------- Vendas de carteiras "deter para recolher" ---------------- */
+  function cardVendas() {
+    var lim = (INV.param || {}).limite_vendas_deter_recolher || { alerta: 0.05, maximo: 0.10 }, v = MOTOR.vendasDeterRecolher(INV, REF);
+    var vendas = [];
+    v.forEach(function (x) { x.vendas.forEach(function (o) { vendas.push({ o: o, c: x.carteira }); }); });
+    return APP.card('Sales from hold-to-collect portfolios · last 12 months', APP.tabela([
+      { t: 'Portfolio', k: function (x) { return '<b>' + e(x.carteira.nome) + '</b><span class="ps-mut ps-small" style="display:block">' + e(x.carteira.modelo) + '</span>'; } },
+      { t: 'Sales', dir: 1, k: function (x) { return x.numero; } },
+      { t: 'Amount sold', dir: 1, k: function (x) { return eur(x.valor); } },
+      { t: 'Share of portfolio', dir: 1, k: function (x) { return '<b>' + APP.pct(x.peso, 1) + '</b>'; } },
+      { t: '', k: function (x) { return APP.barra(x.peso, lim.maximo, lim.alerta); } },
+      { t: 'Alert', dir: 1, k: function () { return APP.pct(lim.alerta, 0); } }, { t: 'Max', dir: 1, k: function () { return APP.pct(lim.maximo, 0); } },
+      { t: 'Status', k: function (x) { return x.peso > lim.maximo ? APP.chip('Above limit', 'err') : x.peso > lim.alerta ? APP.chip('Alert', 'warn') : APP.chip('Within limit', 'ok'); } }
+    ], v) + (vendas.length ? '<h3 class="iv-h3">Sales in the period</h3>' + APP.tabela([
+      { t: 'Reference', k: function (x) { return '<span class="ps-mono">' + x.o.id + '</span>'; } }, { t: 'Date', k: function (x) { return APP.dt(x.o.neg); } },
+      { t: 'Instrument', k: function (x) { return link(insP(x.o.i)); } }, { t: 'Portfolio', k: function (x) { return e(x.c.nome); } },
+      { t: 'Nominal', dir: 1, k: function (x) { return eur(x.o.q); } }, { t: 'Amount (clean)', dir: 1, k: function (x) { return eur((x.o.valor || 0) - (x.o.jc || 0)); } }
+    ], vendas) : '') + '<p class="ps-small ps-mut ps-mt">Under IFRS 9 a hold-to-collect portfolio only allows infrequent or insignificant sales, or sales close to maturity. Sales above the alert need a justification and a review of the business model.</p>');
+  }
+
+  /* ---------------- Mapa de movimentos ---------------- */
+  var MOV = [['inicial', 'Opening balance', 1], ['compras', 'Purchases'], ['vendas', 'Sales (book value)'], ['juro', 'Interest (effective interest method)'], ['fluxos', 'Coupons and redemptions received'], ['transfEntrada', 'Transfers in'], ['transfSaida', 'Transfers out'], ['imparidade', 'Impairment (amortised cost)'], ['justoValor', 'Fair value changes and other'], ['final', 'Closing balance', 1]];
+  B['movimentos'] = function () {
+    var ant = (INV.param || {}).data_anterior || MOTOR.addMeses(REF, -1), mm = MOTOR.mapaMovimentos(INV, ant, REF, (INV.param || {}).precos_anteriores);
+    var cs = INV.carteiras.filter(function (c) { return mm.carteiras[c.id]; });
+    var tot = function (k) { return cs.reduce(function (s, c) { return s + mm.carteiras[c.id][k]; }, 0); };
+    var dif = function (x) { return MOV.slice(0, -1).reduce(function (s, m) { return s + x[m[0]]; }, 0) - x.final; };
+    var linha = function (m) {
+      return '<tr' + (m[2] ? ' class="iv-tot"' : '') + '><td class="prim">' + (m[2] ? '<b>' + m[1] + '</b>' : m[1]) + '</td>' + cs.map(function (c) { return '<td class="dir ps-num" data-l="' + e(c.nome) + '">' + eur(mm.carteiras[c.id][m[0]]) + '</td>'; }).join('') + '<td class="dir ps-num" data-l="Total"><b>' + eur(tot(m[0])) + '</b></td></tr>';
+    };
+    var difs = cs.map(function (c) { return dif(mm.carteiras[c.id]); }), difTot = difs.reduce(function (s, x) { return s + x; }, 0);
+    var inventario = L.reduce(function (s, r) { return s + r.contab + r.jc; }, 0);
+    var tabela = '<div class="ps-tw"><table class="ps-t"><thead><tr><th>' + APP.dt(ant) + ' → ' + APP.dt(REF) + '</th>' + cs.map(function (c) { return '<th class="dir">' + e(c.nome) + '</th>'; }).join('') + '<th class="dir">Total</th></tr></thead><tbody>' +
+      MOV.map(linha).join('') +
+      '<tr><td class="prim">Check: opening + movements − closing</td>' + difs.map(function (d, n) { return '<td class="dir ps-num" data-l="' + e(cs[n].nome) + '">' + eur(d) + '</td>'; }).join('') + '<td class="dir ps-num" data-l="Total">' + eur(difTot) + '</td></tr></tbody></table></div>';
+    var ok = Math.abs(difTot) < 0.01 && Math.abs(tot('final') - inventario) < 0.01;
+    return '<div class="ps-kpis iv-kpis">' + APP.kpi('Opening balance', eur(tot('inicial')), APP.dt(ant)) + APP.kpi('Movements', eur(tot('final') - tot('inicial'))) + APP.kpi('Closing balance', eur(tot('final')), APP.dt(REF)) + APP.kpi('Check', ok ? 'OK' : 'Difference', ok ? 'Closing balance = inventory' : 'Review', ok ? 'k-ok' : 'k-err') + '</div>' +
+      APP.card('Movement schedule by portfolio', tabela + '<p class="ps-small ps-mut ps-mt">Book value including accrued interest. Opening balance at ' + APP.dt(ant) + ' prices. Realised gains and losses are in the sales line as the difference between proceeds and book value.</p>', '<button class="ps-btn" data-a="ok" data-v="Movement schedule exported to Excel">Export</button>');
+  };
+
+  /* ---------------- Reconciliacoes ---------------- */
+  function recDepositario() {
+    var dep = (INV.param || {}).depositario || { posicoes: {}, fora: {}, justificacoes: {}, caixa: [] };
+    var pos = INV.instrumentos.map(function (i) {
+      var q = soma(L.filter(function (r) { return r.ins === i; }), 'q'), d = dep.posicoes[i.id];
+      var fora = dep.fora && dep.fora[i.id], dif = fora ? 0 : (d || 0) - q;
+      return { i: i, q: q, d: d, dif: dif, fora: fora, just: (dep.justificacoes || {})[i.id], estado: fora ? 'Outside custody' : Math.abs(dif) < 0.005 ? 'Matched' : 'To investigate' };
+    }).filter(function (x) { return x.q || x.d; });
+    var caixa = (dep.caixa || []).map(function (m) {
+      var o = INV.operacoes.filter(function (x) { return x.id === m.ref; })[0], p = 0, pend = false;
+      if (o) { pend = o.estado !== 'Approved'; if (!pend) p = o.tipo === 'Purchase' ? -o.valor : (o.valor || 0) - (o.ret || 0); }
+      var dif = m.valor - p;
+      return { m: m, p: p, dif: dif, estado: Math.abs(dif) < 0.005 ? 'Matched' : pend ? 'To record' : 'To investigate' };
+    });
+    return { dep: dep, pos: pos, caixa: caixa };
+  }
+  function recBalancete() {
+    var bal = (INV.param || {}).balancete || { saldos: {}, justificacoes: {} };
+    var inv = MOTOR.saldosPorConta(INV, REF, (INV.param || {}).taxa_impostos_diferidos || 0);
+    var contas = {};
+    inv.forEach(function (x) { contas[x.conta] = { conta: x.conta, descricao: x.descricao, inv: x.valor, gl: 0 }; });
+    Object.keys(bal.saldos).forEach(function (k) { (contas[k] = contas[k] || { conta: k, descricao: '', inv: 0, gl: 0 }).gl = bal.saldos[k]; });
+    return { bal: bal, linhas: Object.keys(contas).sort().map(function (k) { var x = contas[k]; x.dif = x.gl - x.inv; x.just = bal.justificacoes[k]; return x; }) };
+  }
+  function resumoReconciliacoes() {
+    var d = recDepositario(), g = recBalancete(), aberto = function (x) { return Math.abs(x.dif) >= 0.005; };
+    return { dep: d.pos.filter(aberto).length + d.caixa.filter(aberto).length, gl: g.linhas.filter(aberto).length };
+  }
+  var abaR = 'dep';
+  B['reconciliacoes'] = function () {
+    if (APP.q.t) { abaR = APP.q.t; APP.q.t = ''; }
+    var estado = function (s) { return APP.chip(s, s === 'Matched' ? 'ok' : s === 'To record' ? 'rev' : s === 'Outside custody' ? '' : 'warn'); };
+    var corpo;
+    if (abaR === 'dep') {
+      var d = recDepositario();
+      var nd = d.pos.filter(function (x) { return Math.abs(x.dif) >= 0.005; }).length + d.caixa.filter(function (x) { return Math.abs(x.dif) >= 0.005; }).length;
+      corpo = '<div class="ps-kpis iv-kpis">' + APP.kpi('Custodian', e(d.dep.nome), 'Statement at ' + APP.dt(d.dep.data)) + APP.kpi('Positions matched', d.pos.filter(function (x) { return x.estado === 'Matched'; }).length + ' / ' + d.pos.filter(function (x) { return !x.fora; }).length) + APP.kpi('Differences open', nd, '', nd ? 'k-warn' : 'k-ok') + '</div>' +
+        APP.card('Positions', APP.tabela([
+          { t: 'Instrument', k: function (x) { return link(x.i); } },
+          { t: 'Inventory', dir: 1, k: function (x) { return qtd(x.i, x.q); } },
+          { t: 'Custodian', dir: 1, k: function (x) { return x.fora ? '-' : qtd(x.i, x.d || 0); } },
+          { t: 'Difference', dir: 1, k: function (x) { return x.fora ? '-' : '<b>' + (divida(x.i) ? eur(x.dif) : APP.int(x.dif)) + '</b>'; } },
+          { t: 'Status', k: function (x) { return estado(x.estado) + (x.fora || x.just ? '<span class="ps-mut ps-small" style="display:block;max-width:300px;white-space:normal">' + e(x.fora || x.just) + '</span>' : ''); } }
+        ], d.pos), '<button class="ps-btn" data-a="importar" data-v="Custodian statement">Import statement</button>') +
+        '<div class="ps-mt">' + APP.card('Cash movements of the period', APP.tabela([
+          { t: 'Date', k: function (x) { return APP.dt(x.m.data); } }, { t: 'Reference', k: function (x) { return '<span class="ps-mono">' + e(x.m.ref) + '</span>'; } },
+          { t: 'Description', k: function (x) { return e(x.m.desc); } },
+          { t: 'Custodian', dir: 1, k: function (x) { return eur(x.m.valor); } }, { t: 'Inventory', dir: 1, k: function (x) { return eur(x.p); } },
+          { t: 'Difference', dir: 1, k: function (x) { return '<b>' + eur(x.dif) + '</b>'; } },
+          { t: 'Status', k: function (x) { return estado(x.estado) + (x.estado === 'To record' ? '<span class="ps-mut ps-small" style="display:block">Waiting for approval</span>' : ''); } }
+        ], d.caixa)) + '</div>';
+    } else {
+      var g = recBalancete(), tInv = soma(g.linhas, 'inv'), tGl = soma(g.linhas, 'gl');
+      var ng = g.linhas.filter(function (x) { return Math.abs(x.dif) >= 0.005; }).length;
+      corpo = '<div class="ps-kpis iv-kpis">' + APP.kpi('Trial balance', APP.dt(g.bal.data), 'Exported from the ERP') + APP.kpi('Accounts', g.linhas.length) + APP.kpi('Differences open', ng, '', ng ? 'k-err' : 'k-ok') + '</div>' +
+        APP.card('Investment inventory against the general ledger · ' + APP.dt(REF), APP.tabela([
+          { t: 'Account', k: function (x) { return '<b class="ps-mono">' + e(x.conta) + '</b>'; } },
+          { t: 'Description', k: function (x) { return e(x.descricao); } },
+          { t: 'Inventory', dir: 1, k: function (x) { return eur(x.inv); } },
+          { t: 'General ledger', dir: 1, k: function (x) { return eur(x.gl); } },
+          { t: 'Difference', dir: 1, k: function (x) { return '<b>' + eur(x.dif) + '</b>'; } },
+          { t: 'Status', k: function (x) { return (Math.abs(x.dif) < 0.005 ? APP.chip('Matched', 'ok') : APP.chip('Open', 'err')) + (x.just && Math.abs(x.dif) >= 0.005 ? '<span class="ps-mut ps-small" style="display:block;max-width:320px;white-space:normal">' + e(x.just) + '</span>' : ''); } }
+        ], g.linhas, { rodape: '<tr class="iv-tot"><td class="prim" colspan="2">Total</td><td class="dir ps-num" data-l="Inventory">' + eur(tInv) + '</td><td class="dir ps-num" data-l="General ledger">' + eur(tGl) + '</td><td class="dir ps-num" data-l="Difference">' + eur(tGl - tInv) + '</td><td></td></tr>' }) +
+        '<p class="ps-small ps-mut ps-mt">Investments at book value including accrued interest, by PCES account. Differences must be justified before the period is closed.</p>', '<button class="ps-btn" data-a="importar" data-v="Trial balance">Import trial balance</button>');
+    }
+    return '<div class="ps-seg iv-abas"><button type="button" class="' + (abaR === 'dep' ? 'on' : '') + '" data-a="abaR" data-v="dep">Custodian</button><button type="button" class="' + (abaR === 'gl' ? 'on' : '') + '" data-a="abaR" data-v="gl">General ledger</button></div>' + corpo;
+  };
+  A.abaR = function (v) { abaR = v; APP.render(); };
 
   APP.preparar = function () {
     USER = APP.utilizador ? APP.utilizador.nome : '';

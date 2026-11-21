@@ -331,7 +331,7 @@ Por lote e período: juro TJE, dividendos, mais/menos-valias realizadas, variaç
 ## 12. Contabilização e integração com a contabilidade
 
 ### 12.1 Princípio
-A aplicação é o **subrazão de investimentos**. Gera os lançamentos de cada evento, por regra parametrizada, e exporta-os para o ERP. O razão geral continua no ERP.
+A aplicação mantém o **inventário de investimentos** e gera os lançamentos de cada evento, por regra parametrizada, que exporta para o ERP. A contabilidade geral continua no ERP, e o inventário reconcilia-se todos os meses com o balancete (R-56).
 
 ### 12.2 Eventos contabilísticos
 Aquisição; juro TJE do período (acréscimo); cupão recebido; amortização e reembolso; venda (custo, mais/menos-valia, reciclagem da reserva); variação de justo valor (resultados ou reserva); diferença cambial; ECL (dotação e reversão); dividendo atribuído e recebido; imposto retido; transferência entre carteiras (R-54); reclassificação.
@@ -353,6 +353,14 @@ Lista de verificação guiada (padrão de tarefas do ON):
 7. Cálculo do período (custo amortizado, justo valor, reservas, mais-valias).
 8. Lançamentos gerados, validados e exportados.
 9. Período fechado (com aprovação). Fica uma imagem do fecho para reprodução.
+
+### 12.5 Controlos pedidos pela auditoria
+
+- **R-56 Reconciliação com a contabilidade geral.** Todos os meses, o saldo de cada conta do PCES no inventário (investimentos pelo valor contabilístico com juros corridos, por classe 20/21/22/23 e subconta de classificação; reservas de reavaliação 11 01 e 11 08; reserva por impostos diferidos 12) compara-se com o balancete exportado do ERP. As diferenças ficam abertas, com justificação e responsável, e bloqueiam o fecho. A subdivisão das classes 22 e 23 igual à da 20 e o registo dos juros corridos na própria conta do título são **[a confirmar]** com o plano de contas de cada seguradora.
+- **R-57 Reconciliação com o depositário.** Posições por instrumento (quantidade ou nominal) e movimentos de caixa do período comparados com o extrato do depositário. Estados: conciliado, por registar (operação ainda não aprovada), a investigar, fora de custódia (participações não cotadas e depósitos, confirmados por outra via). O extrato fica guardado como evidência do fecho.
+- **R-58 Impostos diferidos.** A reserva de justo valor (11 01 e 11 08) é acompanhada da reserva por impostos diferidos (conta 12) = − reserva × taxa de imposto. A taxa é um parâmetro; o valor da demonstração (22,5%) é ilustrativo e a taxa aplicável a cada seguradora é **[a confirmar]**. O lançamento do período é a variação da reserva × taxa, por contrapartida de passivos por impostos diferidos **[a confirmar conta do PCES]**. Cenário C-12.
+- **R-59 Vendas de carteiras "deter para recolher".** Para cada carteira com este modelo de negócio, a aplicação mostra as vendas dos últimos 12 meses (número, valor e peso no valor da carteira) contra um limite de alerta e um máximo parametrizados (5% e 10% na demonstração). Acima do alerta, a venda exige justificação e revisão do modelo de negócio (IFRS 9 B4.1.3 a B4.1.4). Cenário C-14.
+- **R-60 Mapa de movimentos.** Por carteira e no total: saldo inicial + compras − vendas (pelo valor contabilístico) + juro pelo método do juro efetivo − cupões e reembolsos recebidos ± transferências ± imparidade (custo amortizado) ± variações de justo valor e outros = saldo final. O saldo final tem de ser igual ao inventário, e as transferências de entrada e de saída anulam-se no total. É a base das divulgações da IFRS 7. Cenário C-13.
 
 ## 13. Limites de investimento e conformidade
 
@@ -476,6 +484,12 @@ Decisões em aberto: ver `plano-gestao-investimentos.md`.
 **C-05 FVOCI dívida.** O lote de C-01 classificado em FVOCI, a 2027-01-01: custo amortizado bruto 981 139,05; justo valor 990 000,00; ECL 1 200,00. Reserva de justo valor = 8 860,95 + 1 200,00 (o ECL vai a resultados por contrapartida de ORI) = 10 060,95; valor de balanço = 990 000,00.
 
 **C-11 Repartição da reserva entre carteiras (R-55).** Um lote FVOCI de dívida está na carteira Vida com participação nos resultados A, onde acumula uma reserva de justo valor de +30 000,00. É transferido pelo valor contabilizado para a carteira B (também com participação nos resultados); depois da transferência a reserva varia −5 000,00. Na venda, o ajustamento de reclassificação para resultados é de +25 000,00, repartido por A +30 000,00 e B −5 000,00. A transferência não gerou ganho nem perda.
+
+**C-12 Impostos diferidos (R-58).** Reserva de justo valor de 10 060,95 (C-05) e taxa de 22,5%: reserva por impostos diferidos = −2 263,71; reserva líquida = 7 797,24.
+
+**C-13 Mapa de movimentos (R-60).** Com os dados de demonstração de 30/09/2026 a 31/10/2026: saldo inicial 65 933 763,82; o mapa fecha em cada carteira (diferença 0,00); o saldo final é igual ao inventário a 31/10/2026; a transferência AF-0031 sai do Fundo autónomo PPR e entra nos Valores livres pelo mesmo valor (3 120 452,05).
+
+**C-14 Vendas de "deter para recolher" (R-59).** A carteira Não Vida vendeu 1 000 000 de nominal da OT 1,95% 2029 por 990 500,00 (preço limpo) em 08/10/2026: 7,9% da carteira, acima do alerta de 5% e abaixo do máximo de 10%.
 
 **C-06 Preço manual.** Um preço manual sem aprovação não entra no cálculo. Ao aprovar, a aplicação guarda quem e quando, e o preço anterior fica no histórico.
 

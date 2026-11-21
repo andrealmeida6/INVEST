@@ -4,6 +4,37 @@
 window.INV = {
   dataRef: '2026-10-31',
   periodo: 'Outubro 2026',
+  /* Parametros (tabela inv_parametros). A taxa de imposto e ilustrativa */
+  param: {
+    data_anterior: '2026-09-30',
+    taxa_impostos_diferidos: 0.225,
+    limite_vendas_deter_recolher: { alerta: 0.05, maximo: 0.10 },
+    precos_anteriores: { I01: 100.95, I02: 99.20, I03: 101.70, I04: 103.90, I05: 98.40, I06: 96.70, I07: 100.85, I08: 102.20, I09: 92.40, I10: 17.95, I11: 6.10, I12: 6.80, I13: 104.60, I14: 100 },
+    /* Balancete da contabilidade geral a 31/10 (exportado do ERP). Duas diferencas para demonstracao */
+    balancete: {
+      data: '2026-10-31',
+      saldos: { '11 01': 799332.20, '11 08': 1278000.00, '12': 0, '20 23': 41226407.16, '22 20': 2097720.00, '22 25': 9588455.13, '23 13': 2485000.00, '23 20': 4059290.00, '23 23': 5880445.10 },
+      justificacoes: {
+        '20 23': 'Juro de outubro do lote L012 lançado na classe 20 depois da transferência AF-0031 para valores livres. Correção a lançar.',
+        '23 23': 'Contrapartida da diferença na conta 20 23.',
+        '12': 'Impostos diferidos de outubro ainda não lançados.'
+      }
+    },
+    /* Extrato do depositario a 31/10 */
+    depositario: {
+      nome: 'Depositário A', data: '2026-10-31',
+      posicoes: { I01: 9000000, I02: 3000000, I03: 5000000, I04: 7500000, I05: 7000000, I06: 3050000, I07: 6000000, I08: 7500000, I09: 3500000, I10: 150000, I11: 400000, I13: 35000 },
+      fora: { I12: 'Participação não cotada: registo de ações nominativas na sede', I14: 'Depósito a prazo: confirmação do Banco B' },
+      justificacoes: { I06: 'Em análise com o depositário: 50 000 de nominal a mais no extrato.' },
+      caixa: [
+        { data: '2026-10-09', ref: 'OP-1183', desc: 'Dividendo Retalho F (líquido de imposto retido)', valor: 39375.00 },
+        { data: '2026-10-10', ref: 'OP-1184', desc: 'Venda OT 1,95% 2029', valor: 996750.68 },
+        { data: '2026-10-21', ref: 'OP-1185', desc: 'Compra Fundo Monetário I', valor: -209420.00 },
+        { data: '2026-10-30', ref: 'OP-1187', desc: 'Cupão BTP 4% 2031 - Vida', valor: 100000.00 },
+        { data: '2026-10-30', ref: 'OP-1188', desc: 'Cupão BTP 4% 2031 - Fundo autónomo PPR', valor: 50000.00 }
+      ]
+    }
+  },
   entidade: { id: 'SA', nome: 'Seguradora A', moeda: 'EUR', metodoLotes: 'Custo médio ponderado' },
 
   /* Tipos de carteira e classes de contas da tabela 9 e do quadro de contas do PCES (NR 9/2022-R) */
@@ -127,11 +158,12 @@ window.INV = {
     { t: 'FX rates loaded (ECB)', s: 'ok', d: '31/10 · 4 currencies' },
     { t: 'Prices loaded and exceptions treated', s: 'warn', d: '1 exception open: Energia C 2,25% 2032' },
     { t: 'Cash flows confirmed against custodian', s: 'warn', d: '2 coupons pending approval' },
-    { t: 'Custodian reconciliation', s: 'ok', d: 'Positions and cash: no differences' },
+    { t: 'Custodian reconciliation', s: 'warn', d: '3 differences open' },
     { t: 'Ratings updated and ECL approved', s: 'warn', d: '1 stage change pending approval' },
     { t: 'Limits checked and breaches justified', s: 'ok', d: '1 breach justified (rating < BBB-)' },
     { t: 'Period calculation', s: 'todo', d: 'Amortised cost, fair value, reserves, gains' },
     { t: 'Journal entries generated and exported', s: 'todo', d: 'Export to ERP' },
+    { t: 'General ledger reconciliation', s: 'warn', d: '3 differences open' },
     { t: 'Period closed', s: 'todo', d: 'Needs approval' }
   ],
 

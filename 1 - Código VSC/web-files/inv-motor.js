@@ -73,8 +73,10 @@
   }
 
   /* Posicao de um lote na data de referencia (6.8 e secao 10) */
-  function lote(INV, l, ref) {
+  /* precos (opcional): { idInstrumento: preco } para avaliar noutra data (ex.: precos do fecho anterior) */
+  function lote(INV, l, ref, precos) {
     var ins = INV.instrumentos.filter(function (x) { return x.id === l.i; })[0];
+    var preco = precos && precos[ins.id] != null ? precos[ins.id] : ins.preco;
     var em = INV.emitentes[ins.em];
     var r = { lote: l, ins: ins, em: em, cart: l.c, cl: l.cl, q: l.q };
     var divida = ins.tipo === 'obr' || ins.tipo === 'dep';
@@ -84,7 +86,7 @@
       r.jc = l.q * juroCorrido(ins, ref);
       r.caSujo = vp(ins, ref, r.tje, l.q);
       r.ca = r.caSujo - r.jc;
-      r.jv = l.q * ins.preco / 100;
+      r.jv = l.q * preco / 100;
       /* ECL (R-06): EAD x PD x LGD. Estagio 2 usa PD para a vida residual */
       r.estagio = estagio(l.rt, em.rating);
       var pd = INV.pd12[em.rating] || 0, vida = Math.max(anos(ref, ins.venc), 0);
@@ -94,7 +96,7 @@
       r.ecl = r.ead * r.pd * r.lgd;
       r.ecl1 = r.ead * pd * Math.min(1, vida) * r.lgd;
     } else {
-      r.ca = r.custoAq; r.jc = 0; r.jv = l.q * ins.preco; r.ecl = 0;
+      r.ca = r.custoAq; r.jc = 0; r.jv = l.q * preco; r.ecl = 0;
     }
     if (l.cl === 'CA') { r.contab = r.ca - r.ecl; r.reserva = 0; }
     else if (l.cl === 'FVOCI') { r.contab = r.jv; r.reserva = r.jv - r.ca + r.ecl; }
@@ -105,7 +107,85 @@
     return r;
   }
 
-  function lotes(INV, ref) { return INV.lotes.map(function (l) { return lote(INV, l, ref || INV.dataRef); }); }
+  function lotes(INV, ref, precos) { return INV.lotes.map(function (l) { return lote(INV, l, ref || INV.dataRef, precos); }); }
+
+  var carteira = function (INV, id) { return INV.carteiras.filter(function (c) { return c.id === id; })[0] || {}; };
+
+  /* Conta do PCES de cada lote: classe da carteira (20, 21, 22, 23) e subconta da classificacao (20 25 custo amortizado,
+     20 23 justo valor atraves de reservas, 20 20 justo valor atraves de resultados, 20 13 partes de capital ao justo valor atraves de reservas) */
+  var SUBCONTA = { CA: ['25', 'Ativos financeiros ao custo amortizado'], FVOCI: ['23', 'Ativos financeiros ao justo valor através de reservas'], 'FVOCI-EQ': ['23', 'Ativos financeiros ao justo valor através de reservas'], FVTPL: ['20', 'Ativos financeiros ao justo valor através de resultados'] };
+  function contaDoLote(INV, r) {
+    var k = carteira(INV, r.cart).classe || '23', sc = r.ins.tipo === 'part' ? ['13', 'Partes de capital ao justo valor através de reservas'] : SUBCONTA[r.cl];
+    return { conta: k + ' ' + sc[0], descricao: sc[1] };
+  }
+
+  /* Impostos diferidos sobre a reserva de justo valor (conta 12 do PCES): reserva x taxa, com o sinal contrario */
+  function impostoDiferido(reserva, taxa) { return -reserva * taxa; }
+
+  /* Saldos do inventario por conta do PCES, para reconciliar com o balancete da contabilidade geral.
+     Investimentos pelo valor contabilistico com juros corridos; reservas 11 01 (divida) e 11 08 (capital proprio); 12 impostos diferidos */
+  function saldosPorConta(INV, ref, taxa, precos) {
+    var saldos = {}, add = function (conta, descricao, v) { (saldos[conta] = saldos[conta] || { conta: conta, descricao: descricao, valor: 0 }).valor += v; };
+    var resDiv = 0, resCap = 0;
+    lotes(INV, ref, precos).forEach(function (r) {
+      var c = contaDoLote(INV, r); add(c.conta, c.descricao, r.contab + r.jc);
+      if (r.cl === 'FVOCI') resDiv += r.reserva; else if (r.cl === 'FVOCI-EQ') resCap += r.reserva;
+    });
+    add('11 01', 'Reservas de reavaliação - instrumentos de dívida', resDiv);
+    add('11 08', 'Reservas de reavaliação - instrumentos de capital próprio', resCap);
+    add('12', 'Reserva por impostos diferidos', impostoDiferido(resDiv + resCap, taxa));
+    return Object.keys(saldos).sort().map(function (k) { return saldos[k]; });
+  }
+
+  /* Vendas de carteiras com modelo "deter para recolher" nos ultimos 12 meses, face ao valor da carteira */
+  function vendasDeterRecolher(INV, ref) {
+    var desde = addMeses(ref, -12), ls = lotes(INV, ref);
+    return INV.carteiras.filter(function (c) { return /Hold to collect\)/.test(c.modelo); }).map(function (c) {
+      var vendas = (INV.operacoes || []).filter(function (o) { return o.tipo === 'Sale' && o.c === c.id && o.estado === 'Approved' && o.neg > desde && o.neg <= ref; });
+      var valorVendas = vendas.reduce(function (s, o) { return s + (o.valor || 0) - (o.jc || 0); }, 0);
+      var valorCarteira = ls.filter(function (r) { return r.cart === c.id; }).reduce(function (s, r) { return s + r.contab; }, 0) + valorVendas;
+      return { carteira: c, vendas: vendas, numero: vendas.length, valor: valorVendas, peso: valorCarteira ? valorVendas / valorCarteira : 0 };
+    });
+  }
+
+  /* Mapa de movimentos do periodo (ant, ref] por carteira: saldo inicial + movimentos = saldo final, pelo valor contabilistico
+     com juros corridos. Precos: precosAnt no inicio, precos atuais no fim e nas datas intermedias (transferencias, compras, vendas).
+     Linhas: inicial, compras, vendas, juro TJE, cupoes e reembolsos recebidos, transferencias, imparidade (custo amortizado),
+     variacao de justo valor e outros, final */
+  function mapaMovimentos(INV, ant, ref, precosAnt) {
+    var linhas = ['inicial', 'compras', 'vendas', 'juro', 'fluxos', 'transfEntrada', 'transfSaida', 'imparidade', 'justoValor', 'final'];
+    var m = {}, ops = (INV.operacoes || []).filter(function (o) { return o.estado === 'Approved' && o.neg > ant && o.neg <= ref; });
+    var afs = (INV.afetacoes || []).filter(function (a) { return a.estado === 'Approved' && a.de !== '-' && a.data > ant && a.data <= ref; });
+    var col = function (c) { return m[c] = m[c] || linhas.reduce(function (o, k) { o[k] = 0; return o; }, {}); };
+    var valor = function (l, q, data, precos) { var r = lote(INV, Object.assign({}, l, { q: q }), data, precos); return { v: r.contab + r.jc, r: r }; };
+    /* Um troco do lote: quantidade q na carteira c entre a e b; abre e fecha pelo valor contabilistico e reparte a variacao */
+    var troco = function (l, q, c, a, b, pa, pb, abre, fecha) {
+      var A = valor(l, q, a, pa), B = valor(l, q, b, pb), x = col(c), juro = 0, fl = 0, imp = 0;
+      if (A.r.tje != null) {
+        fluxos(A.r.ins).forEach(function (f) { if (f.data > a && f.data <= b) fl += q * (f.cupao + f.capital); });
+        juro = B.r.caSujo - A.r.caSujo + fl;
+        if (l.cl === 'CA') imp = -(B.r.ecl - A.r.ecl);
+      }
+      x[abre] += A.v; x.juro += juro; x.fluxos -= fl; x.imparidade += imp;
+      x.justoValor += (B.v - A.v) - juro + fl - imp;
+      x[fecha] -= (fecha === 'final' ? -B.v : B.v);
+    };
+    INV.lotes.forEach(function (l) {
+      var compra = ops.filter(function (o) { return o.tipo === 'Purchase' && o.i === l.i && o.c === l.c; })[0];
+      var venda = ops.filter(function (o) { return o.tipo === 'Sale' && o.i === l.i && o.c === l.c; })[0];
+      var af = afs.filter(function (a) { return a.lote === l.id && a.q >= l.q; })[0];
+      var qNova = compra ? compra.q : 0, qIni = l.q - qNova;
+      if (l.d > ant) { qIni = 0; qNova = l.q; }
+      if (qIni > 0) {
+        if (af) { troco(l, qIni, af.de, ant, af.data, precosAnt, null, 'inicial', 'transfSaida'); troco(l, qIni, af.para, af.data, ref, null, null, 'transfEntrada', 'final'); }
+        else troco(l, qIni, l.c, ant, ref, precosAnt, null, 'inicial', 'final');
+      }
+      if (qNova > 0) troco(l, qNova, l.c, compra ? compra.liq : l.d, ref, null, null, 'compras', 'final');
+      if (venda) troco(l, venda.q, l.c, ant, venda.liq, precosAnt, null, 'inicial', 'vendas');
+    });
+    return { linhas: linhas, carteiras: m };
+  }
+
 
   /* Detalhe do calculo (P8): passos com datas e taxas */
   function explicar(INV, l, ref) {
@@ -143,6 +223,6 @@
     return { total: total, porCarteira: porCarteira };
   }
 
-  var M = { valorTransferencia: valorTransferencia, repartirReserva: repartirReserva, d: d, iso: iso, dias: dias, addMeses: addMeses, fluxos: fluxos, juroCorrido: juroCorrido, tje: tje, vp: vp, estagio: estagio, ig: ig, lote: lote, lotes: lotes, explicar: explicar };
+  var M = { contaDoLote: contaDoLote, impostoDiferido: impostoDiferido, saldosPorConta: saldosPorConta, vendasDeterRecolher: vendasDeterRecolher, mapaMovimentos: mapaMovimentos, valorTransferencia: valorTransferencia, repartirReserva: repartirReserva, d: d, iso: iso, dias: dias, addMeses: addMeses, fluxos: fluxos, juroCorrido: juroCorrido, tje: tje, vp: vp, estagio: estagio, ig: ig, lote: lote, lotes: lotes, explicar: explicar };
   if (typeof module !== 'undefined' && module.exports) module.exports = M; else raiz.MOTOR = M;
 })(this);

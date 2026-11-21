@@ -210,6 +210,7 @@ begin
   select jsonb_build_object(
     'dataRef', (select valor #>> '{}' from public.inv_parametros where chave = 'data_ref'),
     'periodo', (select valor #>> '{}' from public.inv_parametros where chave = 'periodo'),
+    'param', coalesce((select jsonb_object_agg(chave, valor) from public.inv_parametros where chave not in ('data_ref', 'periodo')), '{}'),
     'entidade', (select jsonb_build_object('id', id, 'nome', nome, 'moeda', moeda, 'metodoLotes', metodo_lotes) from public.inv_entidades order by id limit 1),
     'carteiras', coalesce((select jsonb_agg(jsonb_strip_nulls(jsonb_build_object('id', id, 'nome', nome, 'tipo', tipo, 'afeto', afeto, 'ramo', ramo, 'classe', classe_contas, 'modelo', modelo_negocio, 'sii', carteira_sii, 'pt', provisoes_tecnicas, 'rff', fundo_autonomo)) order by ordem) from public.inv_carteiras), '[]'),
     'emitentes', coalesce((select jsonb_object_agg(id, jsonb_strip_nulls(jsonb_build_object('nome', nome, 'tipo', tipo, 'pais', pais, 'nace', nace, 'rating', rating, 'ratingAnt', rating_anterior, 'grupo', grupo))) from public.inv_emitentes), '{}'),

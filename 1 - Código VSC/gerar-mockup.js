@@ -4,7 +4,7 @@
 const fs = require('fs'), path = require('path'), crypto = require('crypto');
 const cod = __dirname, raiz = path.dirname(cod);
 const ler = (...p) => fs.readFileSync(path.join(cod, ...p), 'utf8');
-const ORDEM = ['Inicio', 'Instrumentos', 'Instrumento', 'Carteiras', 'Posicoes', 'Afetacoes', 'Operacoes', 'Valorizacoes', 'Imparidade', 'Limites', 'Contabilidade', 'Relatorios', 'Aprovacoes', 'Trilho', 'Backoffice'];
+const ORDEM = ['Inicio', 'Instrumentos', 'Instrumento', 'Carteiras', 'Posicoes', 'Afetacoes', 'Operacoes', 'Valorizacoes', 'Imparidade', 'Limites', 'Contabilidade', 'Movimentos', 'Reconciliacoes', 'Relatorios', 'Aprovacoes', 'Trilho', 'Backoffice'];
 
 const resolver = (html) => html
   .replace(/\{\{\s*snippets\['([^']+)'\]\s*\}\}/g, (_, nome) => {

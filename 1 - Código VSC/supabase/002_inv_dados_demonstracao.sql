@@ -4,7 +4,13 @@ begin;
 truncate public.inv_trilho, public.inv_aprovacoes, public.inv_afetacoes, public.inv_operacoes, public.inv_lotes, public.inv_instrumentos, public.inv_emitentes, public.inv_carteiras, public.inv_entidades, public.inv_limites, public.inv_fecho_passos, public.inv_regras_contabilisticas, public.inv_pd, public.inv_lgd, public.inv_parametros;
 insert into public.inv_parametros (chave, valor) values
   ('data_ref', '"2026-10-31"'),
-  ('periodo', '"Outubro 2026"');
+  ('periodo', '"Outubro 2026"'),
+  ('data_anterior', '"2026-09-30"'),
+  ('taxa_impostos_diferidos', '0.225'),
+  ('limite_vendas_deter_recolher', '{"alerta":0.05,"maximo":0.1}'),
+  ('precos_anteriores', '{"I01":100.95,"I02":99.2,"I03":101.7,"I04":103.9,"I05":98.4,"I06":96.7,"I07":100.85,"I08":102.2,"I09":92.4,"I10":17.95,"I11":6.1,"I12":6.8,"I13":104.6,"I14":100}'),
+  ('balancete', '{"data":"2026-10-31","saldos":{"12":0,"11 01":799332.2,"11 08":1278000,"20 23":41226407.16,"22 20":2097720,"22 25":9588455.13,"23 13":2485000,"23 20":4059290,"23 23":5880445.1},"justificacoes":{"12":"Impostos diferidos de outubro ainda não lançados.","20 23":"Juro de outubro do lote L012 lançado na classe 20 depois da transferência AF-0031 para valores livres. Correção a lançar.","23 23":"Contrapartida da diferença na conta 20 23."}}'),
+  ('depositario', '{"nome":"Depositário A","data":"2026-10-31","posicoes":{"I01":9000000,"I02":3000000,"I03":5000000,"I04":7500000,"I05":7000000,"I06":3050000,"I07":6000000,"I08":7500000,"I09":3500000,"I10":150000,"I11":400000,"I13":35000},"fora":{"I12":"Participação não cotada: registo de ações nominativas na sede","I14":"Depósito a prazo: confirmação do Banco B"},"justificacoes":{"I06":"Em análise com o depositário: 50 000 de nominal a mais no extrato."},"caixa":[{"data":"2026-10-09","ref":"OP-1183","desc":"Dividendo Retalho F (líquido de imposto retido)","valor":39375},{"data":"2026-10-10","ref":"OP-1184","desc":"Venda OT 1,95% 2029","valor":996750.68},{"data":"2026-10-21","ref":"OP-1185","desc":"Compra Fundo Monetário I","valor":-209420},{"data":"2026-10-30","ref":"OP-1187","desc":"Cupão BTP 4% 2031 - Vida","valor":100000},{"data":"2026-10-30","ref":"OP-1188","desc":"Cupão BTP 4% 2031 - Fundo autónomo PPR","valor":50000}]}');
 insert into public.inv_entidades (id, nome, moeda, metodo_lotes) values
   ('SA', 'Seguradora A', 'EUR', 'Custo médio ponderado');
 insert into public.inv_carteiras (id, entidade_id, nome, tipo, afeto, ramo, classe_contas, modelo_negocio, carteira_sii, provisoes_tecnicas, fundo_autonomo, ordem) values
@@ -102,12 +108,13 @@ insert into public.inv_fecho_passos (ordem, titulo, estado, detalhe) values
   (1, 'FX rates loaded (ECB)', 'ok', '31/10 · 4 currencies'),
   (2, 'Prices loaded and exceptions treated', 'warn', '1 exception open: Energia C 2,25% 2032'),
   (3, 'Cash flows confirmed against custodian', 'warn', '2 coupons pending approval'),
-  (4, 'Custodian reconciliation', 'ok', 'Positions and cash: no differences'),
+  (4, 'Custodian reconciliation', 'warn', '3 differences open'),
   (5, 'Ratings updated and ECL approved', 'warn', '1 stage change pending approval'),
   (6, 'Limits checked and breaches justified', 'ok', '1 breach justified (rating < BBB-)'),
   (7, 'Period calculation', 'todo', 'Amortised cost, fair value, reserves, gains'),
   (8, 'Journal entries generated and exported', 'todo', 'Export to ERP'),
-  (9, 'Period closed', 'todo', 'Needs approval');
+  (9, 'General ledger reconciliation', 'warn', '3 differences open'),
+  (10, 'Period closed', 'todo', 'Needs approval');
 insert into public.inv_regras_contabilisticas (id, evento, classificacao, carteira, tipo_ativo, conta_debito, conta_credito) values
   (1, 'Purchase', 'Any', 'Any', 'Debt securities', '20/22/23 · Títulos de dívida (conta da classificação)', '51 Depósitos à ordem'),
   (2, 'Interest (EIR)', 'CA / FVOCI', 'Any', 'Debt securities', '20/22/23 · Títulos de dívida (juros e amortização do prémio ou desconto)', '74 Rendimentos de investimentos'),

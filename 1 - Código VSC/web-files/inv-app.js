@@ -7,7 +7,7 @@
   var nf0 = new Intl.NumberFormat('pt-PT', { maximumFractionDigits: 0 });
 
   APP.e = function (s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); };
-  APP.eur = function (v) { return v == null || isNaN(v) ? '-' : nf2.format(v); };
+  APP.eur = function (v) { return v == null || isNaN(v) ? '-' : nf2.format(Math.abs(v) < 0.005 ? 0 : v); };
   APP.int = function (v) { return v == null || isNaN(v) ? '-' : nf0.format(v); };
   APP.mi = function (v) { return (v / 1e6).toLocaleString('pt-PT', { minimumFractionDigits: 1, maximumFractionDigits: 1 }) + ' M€'; };
   APP.pct = function (v, c) { return v == null || isNaN(v) ? '-' : (v * 100).toLocaleString('pt-PT', { minimumFractionDigits: c == null ? 2 : c, maximumFractionDigits: c == null ? 2 : c }) + '%'; };
@@ -54,7 +54,7 @@
   };
 
   /* Navegacao */
-  var PAG = { inicio: 'Inicio', instrumentos: 'Instrumentos', instrumento: 'Instrumento', carteiras: 'Carteiras', posicoes: 'Posicoes', afetacoes: 'Afetacoes', operacoes: 'Operacoes', valorizacoes: 'Valorizacoes', imparidade: 'Imparidade', limites: 'Limites', contabilidade: 'Contabilidade', relatorios: 'Relatorios', aprovacoes: 'Aprovacoes', trilho: 'Trilho', backoffice: 'Backoffice' };
+  var PAG = { inicio: 'Inicio', instrumentos: 'Instrumentos', instrumento: 'Instrumento', carteiras: 'Carteiras', posicoes: 'Posicoes', afetacoes: 'Afetacoes', operacoes: 'Operacoes', valorizacoes: 'Valorizacoes', imparidade: 'Imparidade', limites: 'Limites', contabilidade: 'Contabilidade', movimentos: 'Movimentos', reconciliacoes: 'Reconciliacoes', relatorios: 'Relatorios', aprovacoes: 'Aprovacoes', trilho: 'Trilho', backoffice: 'Backoffice' };
   APP.q = {};
   APP.ir = function (url) { location.hash = '#' + url; };
   function rota() {

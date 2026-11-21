@@ -8,7 +8,7 @@ const ts = (s) => s ? q(s + ':00 Europe/Lisbon') : 'null';
 const ins = (t, cols, linhas) => linhas.length ? 'insert into public.' + t + ' (' + cols.join(', ') + ') values\n' + linhas.map((l) => '  (' + l.join(', ') + ')').join(',\n') + ';\n' : '';
 let sql = '-- Gerado por gerar-dados.js a partir de dados-demonstracao.js. Nao editar a mao.\n-- Dados ficticios (Seguradora A). Repoe o estado de demonstracao.\nbegin;\n' +
   'truncate public.inv_trilho, public.inv_aprovacoes, public.inv_afetacoes, public.inv_operacoes, public.inv_lotes, public.inv_instrumentos, public.inv_emitentes, public.inv_carteiras, public.inv_entidades, public.inv_limites, public.inv_fecho_passos, public.inv_regras_contabilisticas, public.inv_pd, public.inv_lgd, public.inv_parametros;\n';
-sql += ins('inv_parametros', ['chave', 'valor'], [[q('data_ref'), q(JSON.stringify(I.dataRef))], [q('periodo'), q(JSON.stringify(I.periodo))]]);
+sql += ins('inv_parametros', ['chave', 'valor'], [[q('data_ref'), q(JSON.stringify(I.dataRef))], [q('periodo'), q(JSON.stringify(I.periodo))]].concat(Object.keys(I.param).map((k) => [q(k), q(JSON.stringify(I.param[k]))])));
 sql += ins('inv_entidades', ['id', 'nome', 'moeda', 'metodo_lotes'], [[q(I.entidade.id), q(I.entidade.nome), q(I.entidade.moeda), q(I.entidade.metodoLotes)]]);
 sql += ins('inv_carteiras', ['id', 'entidade_id', 'nome', 'tipo', 'afeto', 'ramo', 'classe_contas', 'modelo_negocio', 'carteira_sii', 'provisoes_tecnicas', 'fundo_autonomo', 'ordem'],
   I.carteiras.map((c, n) => [q(c.id), q(I.entidade.id), q(c.nome), q(c.tipo), q(c.afeto), q(c.ramo), q(c.classe), q(c.modelo), q(c.sii), q(c.pt), q(c.rff), n]));

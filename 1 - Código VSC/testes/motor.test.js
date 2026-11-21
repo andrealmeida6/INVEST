@@ -38,5 +38,27 @@ perto('C-11 parte da carteira B', rep.porCarteira.B, -5000, 0.001);
 const t53 = M.valorTransferencia(INV, l5, '2026-07-02', 300000), r53 = M.lote(INV, l5, '2026-07-02');
 perto('R-53 valor de transferência de 300 000 = 30% do valor contabilizado', t53.valor, 0.3 * (r53.contab + r53.jc), 0.001);
 
+// C-12 impostos diferidos sobre a reserva de justo valor: reserva 10 060,95 a 22,5% = −2 263,71
+perto('C-12 impostos diferidos', M.impostoDiferido(10060.95, 0.225), -2263.71, 0.005);
+
+// C-13 e C-14 com os dados de demonstração
+const vm = require('vm'), fs = require('fs'), path = require('path');
+const cx = { window: {} }; vm.runInNewContext(fs.readFileSync(path.join(__dirname, '../supabase/dados-demonstracao.js'), 'utf8'), cx);
+const D = cx.window.INV, ant = D.param.data_anterior;
+const mm = M.mapaMovimentos(D, ant, D.dataRef, D.param.precos_anteriores);
+const linhas = mm.linhas.filter((l) => l !== 'final');
+let fim = 0;
+Object.keys(mm.carteiras).forEach((c) => { const x = mm.carteiras[c]; perto('C-13 mapa de movimentos fecha · ' + c, linhas.reduce((s, l) => s + x[l], 0) - x.final, 0, 0.001); fim += x.final; });
+const inventario = M.lotes(D, D.dataRef).reduce((s, r) => s + r.contab + r.jc, 0);
+perto('C-13 saldo final do mapa = inventário', fim - inventario, 0, 0.001);
+perto('C-13 transferências: entradas = saídas', Object.values(mm.carteiras).reduce((s, x) => s + x.transfEntrada + x.transfSaida, 0), 0, 0.001);
+const inicial = Object.values(mm.carteiras).reduce((s, x) => s + x.inicial, 0);
+perto('C-13 saldo inicial', inicial, 65933763.82, 0.01);
+const sc = M.saldosPorConta(D, D.dataRef, 0.225), soma = sc.filter((x) => /^2/.test(x.conta)).reduce((s, x) => s + x.valor, 0);
+perto('C-13 contas 20/22/23 = inventário', soma - inventario, 0, 0.001);
+const v = M.vendasDeterRecolher(D, D.dataRef)[0];
+perto('C-14 vendas da carteira Não Vida em 12 meses', v.valor, 990500, 0.01);
+ok('C-14 peso das vendas acima do alerta de 5% e abaixo do máximo de 10%', v.peso > 0.05 && v.peso < 0.10);
+
 console.log(falhas ? falhas + ' falha(s)' : 'Todos os cenarios passam');
 process.exit(falhas ? 1 : 0);

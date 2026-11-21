@@ -41,6 +41,8 @@
         <button type="button" class="ps-h-mbtn" aria-haspopup="true">Accounting<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>
         <div class="ps-h-drop">
           <a class="ps-h-link" href="/contabilidade/" data-nav="Contabilidade">Period close &amp; entries</a>
+          <a class="ps-h-link" href="/movimentos/" data-nav="Movimentos">Movement schedule</a>
+          <a class="ps-h-link" href="/reconciliacoes/" data-nav="Reconciliacoes">Reconciliations</a>
           <a class="ps-h-link" href="/relatorios/" data-nav="Relatorios">Reports</a>
         </div>
       </div>
@@ -251,6 +253,36 @@
   </div>
 </section>
 
+<!-- web page: Movimentos -->
+<section class="ps-pagina" hidden data-pagina="Movimentos">
+  <div class="ps-pag">
+    <!-- snippet: Movimentos/Introducao -->
+<header class="ps-pag-head">
+  <h1>Movement schedule</h1>
+  <p>Opening balance, movements of the period and closing balance by portfolio.</p>
+</header>
+
+    <!-- template: bloco-dinamico -->
+<div data-bloco="movimentos"></div>
+
+  </div>
+</section>
+
+<!-- web page: Reconciliacoes -->
+<section class="ps-pagina" hidden data-pagina="Reconciliacoes">
+  <div class="ps-pag">
+    <!-- snippet: Reconciliacoes/Introducao -->
+<header class="ps-pag-head">
+  <h1>Reconciliations</h1>
+  <p>Investment inventory against the custodian statement and the general ledger.</p>
+</header>
+
+    <!-- template: bloco-dinamico -->
+<div data-bloco="reconciliacoes"></div>
+
+  </div>
+</section>
+
 <!-- web page: Relatorios -->
 <section class="ps-pagina" hidden data-pagina="Relatorios">
   <div class="ps-pag">
@@ -330,9 +362,9 @@
 <div class="ps-toast" data-toast role="status" aria-live="polite" hidden></div>
 
 <script>window.INV_BACKEND = {"url":"https://yujhfscnnngaivwwunom.supabase.co","chave":"sb_publishable_wU6S2mgSbmnTzz4hQMKZ6g_jTj6MMgo"};</script>
-<script src="../1%20-%20C%C3%B3digo%20VSC/web-files/inv-motor.js?v=5e83765d"></script>
-<script src="../1%20-%20C%C3%B3digo%20VSC/web-files/inv-app.js?v=19be6cb7"></script>
-<script src="../1%20-%20C%C3%B3digo%20VSC/web-files/inv-paginas.js?v=58919ef3"></script>
+<script src="../1%20-%20C%C3%B3digo%20VSC/web-files/inv-motor.js?v=6e5c7efd"></script>
+<script src="../1%20-%20C%C3%B3digo%20VSC/web-files/inv-app.js?v=d53a49c0"></script>
+<script src="../1%20-%20C%C3%B3digo%20VSC/web-files/inv-paginas.js?v=cea55d84"></script>
 <script src="../1%20-%20C%C3%B3digo%20VSC/web-files/inv-acesso.js?v=bb7cb8b5"></script>
 </body>
 </html>
